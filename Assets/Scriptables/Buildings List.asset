@@ -15,3 +15,5 @@ MonoBehaviour:
   <Buildings>k__BackingField:
   - {fileID: 11400000, guid: f5590ca15a92a4f079ac5f16e0d855ea, type: 2}
   - {fileID: 11400000, guid: c58bb741b6bd442deaec1b816254da2a, type: 2}
+  - {fileID: 11400000, guid: 975324b7b4a744eaf918b7b2262de6ed, type: 2}
+  - {fileID: 11400000, guid: 9e33da2745d5f45b4b9f8412b3286d67, type: 2}

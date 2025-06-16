@@ -6,7 +6,7 @@ namespace ScriptableObjects
     [CreateAssetMenu(fileName = "Building", menuName = "Village Generation/Building", order = 1)]
     public class Building : ScriptableObject
     {
-        [field: SerializeField] public List<VillagerNeed> Resources { get; set; }
+        [field: SerializeField] public List<VillagerNeed> Resources { get; set; } = new();
         [field: SerializeField] public GameObject Prefab { private get; set; }
         [field: SerializeField] public int Size { get; private set; }
 

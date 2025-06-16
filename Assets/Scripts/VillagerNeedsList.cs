@@ -6,6 +6,11 @@ public class VillagerNeedsList
 {
     private readonly Dictionary<Need, int> _needsDictionary;
 
+    public VillagerNeedsList()
+    {
+        _needsDictionary = new Dictionary<Need, int>();
+    }
+    
     public VillagerNeedsList(List<VillagerNeed> needs)
     {
         _needsDictionary = needs.ToDictionary(n => n.Need, n => n.Value);
@@ -14,6 +19,18 @@ public class VillagerNeedsList
     public VillagerNeedsList(VillagerNeedsList needs)
     {
         _needsDictionary = needs._needsDictionary.ToDictionary(n => n.Key, n => n.Value);
+    }
+    
+    public void IncreaseNeed(List<VillagerNeed> needs)
+    {
+        foreach (var need in needs)
+            IncreaseNeed(need.Need, need.Value);
+    }
+
+    private void IncreaseNeed(Need need, int value)
+    {
+        if (!_needsDictionary.TryAdd(need, value))
+            _needsDictionary[need] += value;
     }
 
     public bool IsSatisfied() => _needsDictionary.All(n => n.Value == 0);

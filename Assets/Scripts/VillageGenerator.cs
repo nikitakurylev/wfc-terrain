@@ -10,31 +10,24 @@ public class VillageGenerator : MonoBehaviour
 
     public void GenerateVillage()
     {
-        var unsatisfiedVillagers =
-            new Queue<Villager>(
-                villageGenerationSettings.VillagersList.Villagers.Select(v => new Villager(v.Needs)));
+        var villageNeeds = new VillagerNeedsList();
+        foreach (var villager in villageGenerationSettings.VillagersList.Villagers)
+            villageNeeds.IncreaseNeed(villager.Needs);
 
         var firstPosition = new Vector2Int(256, 256);
 
-        while (unsatisfiedVillagers.Any())
+        while (!villageNeeds.IsSatisfied())
         {
-            var villager = unsatisfiedVillagers.Dequeue();
-            while (!villager.IsSatisfied())
-            {
-                var bestBuilding =
-                    villageGenerationSettings.BuildingsList.Buildings.MaxBy(v =>
-                        villager.Needs.GetSatisfactionPotential(v.ResourcesList));
+            var bestBuilding =
+                villageGenerationSettings.BuildingsList.Buildings.MaxBy(v =>
+                    villageNeeds.GetSatisfactionPotential(v.ResourcesList));
 
-                var startPos = FindClosestFree(firstPosition, bestBuilding.Size) ?? firstPosition;
-                bestBuilding.SpawnBuilding(terrainManager, startPos);
+            var startPos = FindClosestFree(firstPosition, bestBuilding.Size) ?? firstPosition;
+            bestBuilding.SpawnBuilding(terrainManager, startPos);
 
-                var buildingResources = bestBuilding.GetResourcesInstance();
+            var buildingResources = bestBuilding.GetResourcesInstance();
 
-                villager.Needs.Satisfy(buildingResources);
-                
-                foreach (var otherVillager in unsatisfiedVillagers)
-                    otherVillager.Needs.Satisfy(buildingResources);
-            }
+            villageNeeds.Satisfy(buildingResources);
         }
     }
 
