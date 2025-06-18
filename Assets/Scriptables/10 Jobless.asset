@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 773b70fd37c9432bb885a8eec71ca799, type: 3}
-  m_Name: Villagers List
+  m_Name: 10 Jobless
   m_EditorClassIdentifier: 
   <Villagers>k__BackingField:
   - {fileID: 11400000, guid: f9f90d8fc265f4cf5a6e5903a099d90b, type: 2}

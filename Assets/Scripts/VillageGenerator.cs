@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ScriptableObjects;
@@ -12,18 +13,31 @@ public class VillageGenerator : MonoBehaviour
     {
         var villageNeeds = new VillagerNeedsList();
         foreach (var villager in villageGenerationSettings.VillagersList.Villagers)
-            villageNeeds.IncreaseNeed(villager.Needs);
+            villageNeeds.IncreaseNeeds(villager.Needs);
 
-        var firstPosition = new Vector2Int(256, 256);
+        var villageCenter = new Vector2Int(256, 256);
+        var buildingPositions = new List<Vector2Int>();
 
         while (!villageNeeds.IsSatisfied())
         {
             var bestBuilding =
                 villageGenerationSettings.BuildingsList.Buildings.MaxBy(v =>
-                    villageNeeds.GetSatisfactionPotential(v.ResourcesList));
+                {
+                    var potential = villageNeeds.GetSatisfactionPotential(v.ResourcesList);
+                    Debug.Log($"Potential of {v.name} is {potential}");
+                    return potential;
+                });
 
-            var startPos = FindClosestFree(firstPosition, bestBuilding.Size) ?? firstPosition;
-            bestBuilding.SpawnBuilding(terrainManager, startPos);
+            Debug.Log($"Chose {bestBuilding.name}");
+
+            var startPos = FindClosestFree(villageCenter, bestBuilding.Size);
+            if (!startPos.HasValue)
+                throw new Exception("Couldn't find a free space!");
+            bestBuilding.SpawnBuilding(terrainManager, startPos.Value);
+            buildingPositions.Add(startPos.Value);
+
+            villageCenter = buildingPositions.Aggregate(new Vector2Int(0, 0), (s, v) => s + v) /
+                            buildingPositions.Count;
 
             var buildingResources = bestBuilding.GetResourcesInstance();
 

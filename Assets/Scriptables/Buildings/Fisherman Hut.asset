@@ -7,15 +7,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3ce78fed937b49a1ae80d619443ec121, type: 3}
-  m_Name: Farm
+  m_Name: Fisherman Hut
   m_EditorClassIdentifier: 
   <Resources>k__BackingField:
   - <Need>k__BackingField: 1
-    <Value>k__BackingField: 10
-  - <Need>k__BackingField: 3
-    <Value>k__BackingField: 2
-  <Prefab>k__BackingField: {fileID: 2592138982046168253, guid: 94375e66fba7940f8b7eb697544bd2e5, type: 3}
-  <Size>k__BackingField: 10
+    <Value>k__BackingField: 5
+  - <Need>k__BackingField: 2
+    <Value>k__BackingField: 1
+  <Prefab>k__BackingField: {fileID: 2592138982046168253, guid: b2183c107d87d2d4fbf6690c421d428e, type: 3}
+  <Size>k__BackingField: 1

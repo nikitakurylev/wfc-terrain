@@ -1,5 +1,7 @@
 public enum Need
 {
     Housing,
-    Food
+    Food,
+    Fishing,
+    Farming
 }

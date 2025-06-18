@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Village Generation Settings
   m_EditorClassIdentifier: 
   <BuildingsList>k__BackingField: {fileID: 11400000, guid: fcf76e9e73d9042639f3284229b420ff, type: 2}
-  <VillagersList>k__BackingField: {fileID: 11400000, guid: 29f1376584fad4fcca992825a500d351, type: 2}
+  <VillagersList>k__BackingField: {fileID: 11400000, guid: ce2756283da861b4188ccb6bd706e144, type: 2}

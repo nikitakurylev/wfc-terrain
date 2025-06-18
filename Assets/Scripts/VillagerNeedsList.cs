@@ -11,7 +11,7 @@ public class VillagerNeedsList
         _needsDictionary = new Dictionary<Need, int>();
     }
     
-    public VillagerNeedsList(List<VillagerNeed> needs)
+    public VillagerNeedsList(IEnumerable<VillagerNeed> needs)
     {
         _needsDictionary = needs.ToDictionary(n => n.Need, n => n.Value);
     }
@@ -21,27 +21,28 @@ public class VillagerNeedsList
         _needsDictionary = needs._needsDictionary.ToDictionary(n => n.Key, n => n.Value);
     }
     
-    public void IncreaseNeed(List<VillagerNeed> needs)
+    public void IncreaseNeeds(IEnumerable<VillagerNeed> needs)
     {
-        foreach (var need in needs)
-            IncreaseNeed(need.Need, need.Value);
-    }
-
-    private void IncreaseNeed(Need need, int value)
-    {
-        if (!_needsDictionary.TryAdd(need, value))
-            _needsDictionary[need] += value;
+        foreach (var need in needs.Where(need => !_needsDictionary.TryAdd(need.Need, need.Value)))
+            _needsDictionary[need.Need] += need.Value;
     }
 
     public bool IsSatisfied() => _needsDictionary.All(n => n.Value == 0);
 
-    public int GetSatisfactionPotential(VillagerNeedsList satisfactionSource)
+    public float GetSatisfactionPotential(VillagerNeedsList satisfactionSource)
     {
-        return _needsDictionary.Sum(need =>
+        var satisfiedNeeds = 0;
+        var potential = _needsDictionary.Sum(need =>
         {
-            satisfactionSource.EstimateSatisfactionIfPossible(need.Key, need.Value, out var satisfaction);
-            return satisfaction;
+            if (!satisfactionSource._needsDictionary.TryGetValue(need.Key, out var resource))
+                return 0f;
+
+            satisfiedNeeds++;
+            float distance = Mathf.Abs(resource - need.Value);
+
+            return 1f - Mathf.Min(distance / need.Value, 1f);
         });
+        return potential * satisfiedNeeds;
     }
 
     public void Satisfy(VillagerNeedsList satisfactionSource)

@@ -4,10 +4,10 @@ using UnityEngine;
 namespace ScriptableObjects
 {
     [CreateAssetMenu(fileName = "Building", menuName = "Village Generation/Building", order = 1)]
-    public class Building : ScriptableObject
+    public class BuildingPrototype : ScriptableObject
     {
-        [field: SerializeField] public List<VillagerNeed> Resources { get; set; } = new();
-        [field: SerializeField] public GameObject Prefab { private get; set; }
+        [field: SerializeField] private List<VillagerNeed> Resources { get; set; } = new();
+        [field: SerializeField] private GameObject Prefab { get; set; }
         [field: SerializeField] public int Size { get; private set; }
 
         public VillagerNeedsList ResourcesList { get; private set; }
@@ -21,7 +21,8 @@ namespace ScriptableObjects
 
         public virtual void SpawnBuilding(TerrainManager terrainManager, Vector2Int position)
         {
-            Instantiate(Prefab, terrainManager.GetWorldPosition(position) + new Vector3(Size / 2f, 0, Size / 2f), Quaternion.identity);
+            var building = Instantiate(Prefab, terrainManager.GetWorldPosition(position) + new Vector3(Size, 0, Size) / 2f * terrainManager.TileScale, Quaternion.identity);
+            building.transform.localScale *= terrainManager.TileScale;
         }
     }
 }
