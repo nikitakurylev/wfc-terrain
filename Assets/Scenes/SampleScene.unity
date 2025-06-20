@@ -519,7 +519,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   terrain: {fileID: 1524920043}
-  maxHeightDifference: 0.5
+  maxHeightDifference: 0.7
 --- !u!154 &1524920042
 TerrainCollider:
   m_ObjectHideFlags: 0

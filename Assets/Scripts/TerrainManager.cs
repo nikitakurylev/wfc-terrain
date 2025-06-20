@@ -8,11 +8,13 @@ public class TerrainManager : MonoBehaviour
     public float TileScale { get; private set; }
 
     private bool[,] _canBuild;
-    private int[,] _horizontalFreeSpace;
+    private int[,] _horizontalRightFreeSpace;
     private int[,] _verticalFreeSpace;
     private float[,] _heights;
     private float _yOffset;
-    
+    int _width;
+    int _length;
+
     public void GenerateTerrain()
     {
         _yOffset = terrain.transform.position.y;
@@ -21,23 +23,23 @@ public class TerrainManager : MonoBehaviour
         _heights = terrain.terrainData.GetHeights(0, 0, terrainData.heightmapResolution,
             terrainData.heightmapResolution);
 
-        var width = _heights.GetLength(0);
-        var length = _heights.GetLength(1);
-        TileScale = terrainData.size.x / width;
+        _width = _heights.GetLength(0);
+        _length = _heights.GetLength(1);
+        TileScale = terrainData.size.x / _width;
 
-        for (var i = 0; i < width; i++)
-        for (var j = 0; j < length; j++)
+        for (var i = 0; i < _width; i++)
+        for (var j = 0; j < _length; j++)
             _heights[i, j] = 0.47f + 0.53f * Mathf.PerlinNoise(i / 50f, j / 50f) *
                 Mathf.PerlinNoise(i / 500f, j / 500f) * Mathf.PerlinNoise(i / 100f, j / 100f);
 
         terrain.terrainData.SetHeights(0, 0, _heights);
-        _canBuild = new bool[width, length];
-        _horizontalFreeSpace = new int[width, length];
-        _verticalFreeSpace = new int[width, length];
+        _canBuild = new bool[_width, _length];
+        _horizontalRightFreeSpace = new int[_width, _length];
+        _verticalFreeSpace = new int[_width, _length];
 
         var alphaMaps = new float[terrainData.alphamapResolution, terrainData.alphamapResolution, 2];
-        for (var i = 1; i < width - 1; i++)
-        for (var j = 1; j < length - 1; j++)
+        for (var i = 1; i < _width - 1; i++)
+        for (var j = 1; j < _length - 1; j++)
         {
             var currentHeight = _heights[i, j];
             _canBuild[i, j] = currentHeight * terrainData.size.y > -_yOffset &&
@@ -57,12 +59,12 @@ public class TerrainManager : MonoBehaviour
                 alphaMaps[i, j, 1] = 1;
             }
         }
-        for (var i = width - 2; i > 0; i--)
-        for (var j = length - 2; j > 0; j--)
+        for (var i = _width - 2; i > 0; i--)
+        for (var j = _length - 2; j > 0; j--)
         {
             if (!_canBuild[i, j])
                 continue;
-            _horizontalFreeSpace[i, j] = _horizontalFreeSpace[i + 1, j] + 1;
+            _horizontalRightFreeSpace[i, j] = _horizontalRightFreeSpace[i + 1, j] + 1;
             _verticalFreeSpace[i, j] = _verticalFreeSpace[i, j + 1] + 1;
         }
 
@@ -94,7 +96,7 @@ public class TerrainManager : MonoBehaviour
     public bool IsSquareFree(Vector2Int start, int size)
     {
         for (var i = 0; i < size; i++)
-            if (_verticalFreeSpace[start.x + i, start.y] < size || _horizontalFreeSpace[start.x + i, start.y] < size)
+            if (_verticalFreeSpace[start.x + i, start.y] < size)// || _horizontalFreeSpace[start.x + i, start.y] < size)
                 return false;
         return true;
     }
@@ -107,14 +109,14 @@ public class TerrainManager : MonoBehaviour
             if(!_canBuild[i + start.x, j + start.y])
                 Debug.LogError("eee");
             _canBuild[i + start.x, j + start.y] = false;
-            _horizontalFreeSpace[i + start.x, j + start.y] = 0;
+            _horizontalRightFreeSpace[i + start.x, j + start.y] = 0;
             _verticalFreeSpace[i + start.x, j + start.y] = 0;
         }
 
         for (var i = 0; i < size; i++)
         for (var j = 1; _canBuild[start.x - j, start.y + i]; j++)
         {
-            _horizontalFreeSpace[start.x - j, start.y + i] = j;
+            _horizontalRightFreeSpace[start.x - j, start.y + i] = j;
         }
 
         for (var i = 0; i < size; i++)
@@ -124,5 +126,15 @@ public class TerrainManager : MonoBehaviour
         }
         
         Paint(start, size);
+    }
+
+    public int GetTotalFreeSpace(Vector2Int position)
+    {
+        return _verticalFreeSpace[position.x, position.y] + _horizontalRightFreeSpace[position.x, position.y];
+    }
+
+    public bool IsInBounds(Vector2Int position)
+    {
+        return position.x >= 0 && position.y >= 0 && position.x < _width && position.y < _length;
     }
 }

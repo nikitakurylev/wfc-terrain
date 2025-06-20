@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7abded003b04ce5a7aa24d2736024d9, type: 3}
   m_Name: Village Generation Settings
   m_EditorClassIdentifier: 
-  <BuildingsList>k__BackingField: {fileID: 11400000, guid: fcf76e9e73d9042639f3284229b420ff, type: 2}
-  <VillagersList>k__BackingField: {fileID: 11400000, guid: ce2756283da861b4188ccb6bd706e144, type: 2}
+  <BuildingsList>k__BackingField: {fileID: 11400000, guid: 346bb476f0575db47828c9e23c5afbfd, type: 2}
+  <VillagersList>k__BackingField: {fileID: 11400000, guid: 4c4e87a2f1219b74da9b0e77b8c17a90, type: 2}
