@@ -1,3 +1,4 @@
+using TerrainGeneration;
 using UnityEngine;
 
 public class WorldGenerator : MonoBehaviour
@@ -8,6 +9,6 @@ public class WorldGenerator : MonoBehaviour
     private void Start()
     {
         terrainManager.GenerateTerrain();
-        villageGenerator.GenerateVillage();
+        //villageGenerator.GenerateVillage();
     }
 }

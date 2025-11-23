@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f8e460156954a3a98f6ccb5fa652b34, type: 3}
+  m_Name: Beach
+  m_EditorClassIdentifier: 
+  <Amplitude>k__BackingField: 0.53
+  <Neighbours>k__BackingField:
+  - {fileID: 11400000, guid: 17cd19408bb57ac44845a6cc02cc0139, type: 2}
+  - {fileID: 11400000}
+  - {fileID: 11400000, guid: b87dbc4435ed99742a6f2ddc2dfa425f, type: 2}

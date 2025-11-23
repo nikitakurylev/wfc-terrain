@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TerrainGeneration;
 using UnityEngine;
 
 namespace ScriptableObjects
