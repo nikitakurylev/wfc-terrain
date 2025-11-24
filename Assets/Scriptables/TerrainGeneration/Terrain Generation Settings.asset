@@ -17,3 +17,27 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1d762a5128c10774c9caa3c6b2e314f7, type: 2}
   - {fileID: 11400000, guid: 17cd19408bb57ac44845a6cc02cc0139, type: 2}
   - {fileID: 11400000, guid: b87dbc4435ed99742a6f2ddc2dfa425f, type: 2}
+  <InterpolationCurve>k__BackingField:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
