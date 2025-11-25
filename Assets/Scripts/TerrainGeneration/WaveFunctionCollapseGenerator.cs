@@ -1,6 +1,11 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using TerrainGeneration.ScriptableObjects;
+using Unity.VisualScripting;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace TerrainGeneration
 {
@@ -10,20 +15,57 @@ namespace TerrainGeneration
 
         public Biome[,] Generate(int size)
         {
-            var debug = string.Empty;
+            Biome[,] result;
+            
+            while (!TryGenerate(size, out result))
+            {
+                Debug.LogWarning("WFC failed, trying again");
+            }
+
+            return result;
+        }
+
+        private bool TryGenerate(int size, out Biome[,] result)
+        {
             var array = new Biome[size, size];
             for (var i = 0; i < size; i++)
             {
-                for (var j = 0; j < size; j++)
+                int j;
+                for (j = 0; j < size && j >= 0; j++)
                 {
+                    Debug.Log($"{i} {j}");
+                    var rollbackValue = array[i, j];
+                    array[i, j] = null;
+
                     var scores = _terrainGenerationSettings.Biomes.ToDictionary(b => b, _ => 0);
-                    for (var k = Mathf.Max(i - 1, 0); k < Mathf.Min(i + 1, size); k++)
-                    for (var l = Mathf.Max(j - 1, 0); l < Mathf.Min(j + 1, size); l++)
+                    for (var k = Mathf.Max(i - 1, 0); k < Mathf.Min(i + 2, size); k++)
+                    for (var l = Mathf.Max(j - 1, 0); l < Mathf.Min(j + 2, size); l++)
                     {
                         if (array[k, l] == null)
                             continue;
+                        
                         foreach (var neighbour in array[k, l].Neighbours)
                             scores[neighbour]++;
+                    }
+
+                    for (var k = Mathf.Max(i - 1, 0); k < Mathf.Min(i + 2, size); k++)
+                    for (var l = Mathf.Max(j - 1, 0); l < Mathf.Min(j + 2, size); l++)
+                    {
+                        if (array[k, l] == null)
+                            continue;
+
+                        foreach (var biome in _terrainGenerationSettings.Biomes
+                                     .Where(biome => !array[k, l].Neighbours.Contains(biome)))
+                        {
+                            scores.Remove(biome);
+                        }
+                    }
+                    
+                    if (!scores.Any())
+                    {
+                        Debug.LogError("Rolling Back");
+                        j -= 2;
+                        continue;
                     }
 
                     var maxScore = scores.Values.Max();
@@ -33,16 +75,24 @@ namespace TerrainGeneration
                         .Select(s => s.Key)
                         .ToList();
 
-                    array[i, j] = possibilities[Random.Range(0, possibilities.Count)];
-                    debug += $"{array[i, j].name} ";
+                    var possibility = possibilities[Random.Range(0, possibilities.Count)];
+
+                    if (possibility == rollbackValue)
+                    {
+                        Debug.LogError("Rolling Back");
+                        j -= 2;
+                        continue;
+                    }
+                    
+                    array[i, j] = possibility;
                 }
 
-                debug += "\n";
+                if (j < 0)
+                    i -= 2;
             }
 
-            Debug.LogWarning(debug);
-
-            return array;
+            result = array;
+            return true;
         }
     }
 }
