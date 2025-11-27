@@ -12,8 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f8e460156954a3a98f6ccb5fa652b34, type: 3}
   m_Name: Beach
   m_EditorClassIdentifier: 
-  <Amplitude>k__BackingField: 0.53
+  <OctaveAmplitudes>k__BackingField:
+  - 0.495
+  - 0.005
+  - 0.005
+  - 0
   <Neighbours>k__BackingField:
-  - {fileID: 11400000, guid: 17cd19408bb57ac44845a6cc02cc0139, type: 2}
+  - {fileID: 11400000, guid: bf6fd255e1c75c64bb06d6c6b06ec8e4, type: 2}
   - {fileID: 11400000}
   - {fileID: 11400000, guid: b87dbc4435ed99742a6f2ddc2dfa425f, type: 2}

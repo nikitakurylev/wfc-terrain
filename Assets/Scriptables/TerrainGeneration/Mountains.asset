@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f8e460156954a3a98f6ccb5fa652b34, type: 3}
   m_Name: Mountains
   m_EditorClassIdentifier: 
-  <Amplitude>k__BackingField: 0.8
+  <OctaveAmplitudes>k__BackingField:
+  - 0.53
+  - 0.05
+  - 0.1
+  - 0.02
   <Neighbours>k__BackingField:
-  - {fileID: 11400000, guid: 1d762a5128c10774c9caa3c6b2e314f7, type: 2}
+  - {fileID: 11400000, guid: bf6fd255e1c75c64bb06d6c6b06ec8e4, type: 2}
   - {fileID: 11400000}

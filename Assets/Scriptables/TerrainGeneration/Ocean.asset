@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f8e460156954a3a98f6ccb5fa652b34, type: 3}
   m_Name: Ocean
   m_EditorClassIdentifier: 
-  <Amplitude>k__BackingField: 0.1
+  <OctaveAmplitudes>k__BackingField:
+  - 0.47
+  - 0
+  - 0
+  - 0
   <Neighbours>k__BackingField:
   - {fileID: 11400000}
   - {fileID: 11400000, guid: 1d762a5128c10774c9caa3c6b2e314f7, type: 2}

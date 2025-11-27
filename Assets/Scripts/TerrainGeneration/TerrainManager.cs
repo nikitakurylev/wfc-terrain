@@ -1,6 +1,7 @@
 using TerrainGeneration.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Vector2 = System.Numerics.Vector2;
 
 namespace TerrainGeneration
 {
@@ -34,8 +35,17 @@ namespace TerrainGeneration
             _width = _heights.GetLength(0);
             _length = _heights.GetLength(1);
             TileScale = terrainData.size.x / _width;
+            var biomeMapSize = _width / settings.BiomeSize + 1;
 
-            var biomes = waveFunctionCollapseGenerator.Generate(_width / settings.BiomeSize + 1);
+            var biomes = waveFunctionCollapseGenerator.Generate(biomeMapSize);
+            var offsets = new Vector2[biomeMapSize, biomeMapSize];
+            for (int i = 0; i < biomeMapSize; i++)
+            {
+                for (int j = 0; j < biomeMapSize; j++)
+                {
+                    offsets[i, j] = new Vector2(Random.Range(-settings.MaxRandomOffset, settings.MaxRandomOffset), Random.Range(-settings.MaxRandomOffset, settings.MaxRandomOffset));
+                }
+            }
 
             for (var i = 0; i < _width; i++)
             {
@@ -45,15 +55,25 @@ namespace TerrainGeneration
                 {
                     var verticalT = (j - 1) % settings.BiomeSize / (float)settings.BiomeSize;
                     var biomeY = (j - 1) / settings.BiomeSize;
-                    var biomeFactor = Mathf.Lerp(
-                        Mathf.Lerp(biomes[biomeX, biomeY].Amplitude,
-                            biomes[biomeX + 1, biomeY].Amplitude,
-                            settings.InterpolationCurve.Evaluate(horizontalT)),
-                        Mathf.Lerp(biomes[biomeX, biomeY + 1].Amplitude,
-                            biomes[biomeX + 1, biomeY + 1].Amplitude,
-                            settings.InterpolationCurve.Evaluate(horizontalT)),
-                        settings.InterpolationCurve.Evaluate(verticalT));
-                    _heights[i, j] = biomeFactor;
+                    var offset = BiLerp(
+                        offsets[biomeX, biomeY], 
+                        offsets[biomeX + 1, biomeY],
+                        offsets[biomeX, biomeY + 1], 
+                        offsets[biomeX + 1, biomeY + 1], 
+                        horizontalT, verticalT);
+                    _heights[i, j] = 0f;
+                    for (var octaveIndex = 0; octaveIndex < settings.OctaveScales.Count; octaveIndex++)
+                    {
+                        var octaveScale = settings.OctaveScales[octaveIndex];
+                        var biomeFactor = BiLerp(
+                            biomes[biomeX, biomeY].OctaveAmplitudes[octaveIndex],
+                            biomes[biomeX + 1, biomeY].OctaveAmplitudes[octaveIndex],
+                            biomes[biomeX, biomeY + 1].OctaveAmplitudes[octaveIndex],
+                            biomes[biomeX + 1, biomeY + 1].OctaveAmplitudes[octaveIndex],
+                            horizontalT + offset.X, verticalT + offset.Y);
+                        _heights[i, j] += octaveIndex == 0 ? biomeFactor : Mathf.PerlinNoise(i * octaveScale, j * octaveScale) * biomeFactor;
+                    }
+
                     /*_heights[i, j] = 0.47f + 0.53f * biomeFactor * Mathf.PerlinNoise(i / 50f, j / 50f) *
                         Mathf.PerlinNoise(i / 500f, j / 500f) * Mathf.PerlinNoise(i / 100f, j / 100f);*/
                 }
@@ -169,6 +189,32 @@ namespace TerrainGeneration
         public bool IsInBounds(Vector2Int position)
         {
             return position.x >= 0 && position.y >= 0 && position.x < _width && position.y < _length;
+        }
+
+        private float BiLerp(float topLeft, float topRight, float bottomLeft, float bottomRight, float horizontalT,
+            float verticalT)
+        {
+            return Mathf.Lerp(
+                Mathf.Lerp(topLeft,
+                    topRight,
+                    settings.InterpolationCurve.Evaluate(horizontalT)),
+                Mathf.Lerp(bottomLeft,
+                    bottomRight,
+                    settings.InterpolationCurve.Evaluate(horizontalT)),
+                settings.InterpolationCurve.Evaluate(verticalT));
+        }
+
+        private Vector2 BiLerp(Vector2 topLeft, Vector2 topRight, Vector2 bottomLeft, Vector2 bottomRight, float horizontalT,
+            float verticalT)
+        {
+            return Vector2.Lerp(
+                Vector2.Lerp(topLeft,
+                    topRight,
+                    settings.InterpolationCurve.Evaluate(horizontalT)),
+                Vector2.Lerp(bottomLeft,
+                    bottomRight,
+                    settings.InterpolationCurve.Evaluate(horizontalT)),
+                settings.InterpolationCurve.Evaluate(verticalT));
         }
     }
 }

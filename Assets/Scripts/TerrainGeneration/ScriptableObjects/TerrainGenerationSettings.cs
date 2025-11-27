@@ -9,5 +9,8 @@ namespace TerrainGeneration.ScriptableObjects
         [field:SerializeField] public int BiomeSize { get; private set; }
         [field:SerializeField] public List<Biome> Biomes { get; private set; }
         [field:SerializeField] public AnimationCurve InterpolationCurve { get; private set; }
+        [field:SerializeField] public float MaxRandomOffset { get; private set; }
+        [field:SerializeField] public List<float> OctaveScales { get; private set; }
+
     }
 }
