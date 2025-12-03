@@ -15,11 +15,9 @@ namespace TerrainGeneration
 
         public Biome[,] Generate(int size)
         {
-            Biome[,] result;
-            
-            while (!TryGenerate(size, out result))
+            if (!TryGenerate(size, out var result))
             {
-                Debug.LogWarning("WFC failed, trying again");
+                Debug.LogError("WFC failed");
             }
 
             return result;
@@ -87,8 +85,14 @@ namespace TerrainGeneration
                     array[i, j] = possibility;
                 }
 
-                if (j < 0)
-                    i -= 2;
+                if (j >= 0) continue;
+                
+                i -= 2;
+                
+                if (i >= 0) continue;
+
+                result = null;
+                return false;
             }
 
             result = array;

@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Mountains
   m_EditorClassIdentifier: 
   <OctaveAmplitudes>k__BackingField:
-  - 0.53
+  - 0.5001
   - 0.05
   - 0.1
   - 0.02
+  - 0
   <Neighbours>k__BackingField:
   - {fileID: 11400000, guid: bf6fd255e1c75c64bb06d6c6b06ec8e4, type: 2}
   - {fileID: 11400000}

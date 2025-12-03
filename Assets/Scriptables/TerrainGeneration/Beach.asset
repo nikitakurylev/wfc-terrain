@@ -17,6 +17,7 @@ MonoBehaviour:
   - 0.005
   - 0.005
   - 0
+  - 0
   <Neighbours>k__BackingField:
   - {fileID: 11400000, guid: bf6fd255e1c75c64bb06d6c6b06ec8e4, type: 2}
   - {fileID: 11400000}
