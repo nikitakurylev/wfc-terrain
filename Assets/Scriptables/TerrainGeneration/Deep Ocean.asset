@@ -22,3 +22,6 @@ MonoBehaviour:
   - {fileID: 11400000}
   - {fileID: 11400000, guid: 27b42511bac42e2488d1578de4ec44fc, type: 2}
   - {fileID: 11400000, guid: b87dbc4435ed99742a6f2ddc2dfa425f, type: 2}
+  _colors:
+  - <Height>k__BackingField: 0
+    <Layer>k__BackingField: {fileID: 8574412962073106934, guid: c01275b21a7f65b4a84a512296cc8355, type: 2}

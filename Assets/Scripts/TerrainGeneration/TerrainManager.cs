@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using TerrainGeneration.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -26,6 +28,7 @@ namespace TerrainGeneration
             _yOffset = terrain.transform.position.y;
 
             var terrainData = terrain.terrainData;
+            var layers = terrainData.terrainLayers.ToList();
             _heights = terrain.terrainData.GetHeights(0, 0, terrainData.heightmapResolution,
                 terrainData.heightmapResolution);
 
@@ -44,7 +47,7 @@ namespace TerrainGeneration
                 }
             }
 
-            var alphaMaps = new float[terrainData.alphamapResolution, terrainData.alphamapResolution, settings.Biomes.Count];
+            var alphaMaps = new float[terrainData.alphamapResolution, terrainData.alphamapResolution, terrainData.alphamapLayers];
             for (var i = 0; i < _width; i++)
             {
                 var horizontalT = (i - 1) % settings.BiomeSize / (float)settings.BiomeSize;
@@ -74,14 +77,6 @@ namespace TerrainGeneration
                         horizontalT + offset.X, verticalT + offset.Y
                     );
 
-                    if (i < terrainData.alphamapResolution && j < terrainData.alphamapResolution)
-                    {
-                        alphaMaps[i, j, settings.Biomes.IndexOf(topLeft)] += alphas.x;
-                        alphaMaps[i, j, settings.Biomes.IndexOf(topRight)] += alphas.y;
-                        alphaMaps[i, j, settings.Biomes.IndexOf(bottomLeft)] += alphas.z;
-                        alphaMaps[i, j, settings.Biomes.IndexOf(bottomRight)] += alphas.w;
-                    }
-
                     for (var octaveIndex = 0; octaveIndex < settings.OctaveScales.Count; octaveIndex++)
                     {
                         var octaveScale = settings.OctaveScales[octaveIndex];
@@ -93,12 +88,26 @@ namespace TerrainGeneration
                             horizontalT + offset.X, verticalT + offset.Y);
                         _heights[i, j] += octaveIndex == 0 ? biomeFactor : Mathf.PerlinNoise(i * octaveScale, j * octaveScale) * biomeFactor;
                     }
+
+                    if (i < terrainData.alphamapResolution && j < terrainData.alphamapResolution)
+                    {
+                        AddTerrainLayerAlpha(alphaMaps, i, j, alphas.x, layers, topLeft, _heights[i, j]);
+                        AddTerrainLayerAlpha(alphaMaps, i, j, alphas.y, layers, topRight, _heights[i, j]);
+                        AddTerrainLayerAlpha(alphaMaps, i, j, alphas.z, layers, bottomLeft, _heights[i, j]);
+                        AddTerrainLayerAlpha(alphaMaps, i, j, alphas.w, layers, bottomRight, _heights[i, j]);
+                    }
                 }
             }
 
             terrain.terrainData.SetHeights(0, 0, _heights);
 
             terrain.terrainData.SetAlphamaps(0, 0, alphaMaps);
+        }
+
+        private void AddTerrainLayerAlpha(float[,,] alphaMaps, int i, int j, float t, IList<TerrainLayer> layers, Biome biome, float height)
+        {
+            foreach (var layer in biome.GetLayers(height))
+                alphaMaps[i, j, layers.IndexOf(layer.Layer)] += t * layer.Value;
         }
 
         public Vector3 GetWorldPosition(Vector2Int position)
