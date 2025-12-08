@@ -21,7 +21,6 @@ MonoBehaviour:
   <Neighbours>k__BackingField:
   - {fileID: 11400000}
   - {fileID: 11400000, guid: 1d762a5128c10774c9caa3c6b2e314f7, type: 2}
-  - {fileID: 11400000, guid: 56877854a7e0e724293e0d161fbcea3d, type: 2}
   _colors:
   - <Height>k__BackingField: 0
     <Layer>k__BackingField: {fileID: 8574412962073106934, guid: af1789bc4a15968459d67a7cb4b62c53, type: 2}
