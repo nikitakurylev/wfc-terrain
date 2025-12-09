@@ -39,23 +39,20 @@ namespace TerrainGeneration
 
             for (var n = 0; n < size * size; n++)
             {
-                var bestPossibilities = new List<Biome>();
+                var bestPossibilities = new Dictionary<Biome, float>();
                 var bestPossibilitiesCount = 0;
-                int bestI = 0, bestJ = 0, bestScore = 0;
+                int bestI = 0, bestJ = 0;
                 foreach (var position in positions)
                 {
                     var (i, j) = position;
-                    var possibilities = _terrainGenerationSettings.Biomes.ToList();
-
-                    var scores = _terrainGenerationSettings.Biomes.ToDictionary(b => b, _ => 0);
+                    var scores = _terrainGenerationSettings.Biomes.ToDictionary(b => b, _ => 1f);
                     for (var k = Mathf.Max(i - 1, 0); k < Mathf.Min(i + 2, size); k++)
                     for (var l = Mathf.Max(j - 1, 0); l < Mathf.Min(j + 2, size); l++)
                     {
                         if (array[k, l] == null)
                             continue;
                         
-                        foreach (var neighbour in array[k, l].Neighbours)
-                            scores[neighbour]++;
+                        scores[array[k, l]] += array[k, l].ClusterFactor;
                     }
                     
                     for (var k = Mathf.Max(i - 1, 0); k < Mathf.Min(i + 2, size); k++)
@@ -67,24 +64,18 @@ namespace TerrainGeneration
                         foreach (var biome in _terrainGenerationSettings.Biomes
                                      .Where(biome => !array[k, l].Neighbours.Contains(biome)))
                         {
-                            possibilities.Remove(biome);
+                            scores.Remove(biome);
                         }
                     }
 
-                    if (!possibilities.Any())
+                    if (!scores.Any())
                         continue;
 
-                    if (bestPossibilitiesCount > 0 && bestPossibilitiesCount < possibilities.Count)
+                    if (bestPossibilitiesCount > 0 && bestPossibilitiesCount <= scores.Count)
                         continue;
                     
-                    var maxScore = possibilities.Max(b => scores[b]);
-
-                    if (bestPossibilitiesCount == possibilities.Count && bestScore > maxScore)
-                        continue;
-                    
-                    bestPossibilitiesCount = possibilities.Count;
-                    bestScore = maxScore;
-                    bestPossibilities = possibilities.Where(b => scores[b] == maxScore).ToList();
+                    bestPossibilitiesCount = scores.Count;
+                    bestPossibilities = scores;
                     bestI = i;
                     bestJ = j;
                 }
@@ -96,7 +87,20 @@ namespace TerrainGeneration
                     return false;
                 }
 
-                var possibility = bestPossibilities[Random.Range(0, bestPossibilities.Count)];
+                var scoreSum = bestPossibilities.Values.Sum();
+
+                var random = Random.Range(0f, scoreSum);
+                var currentSum = 0f;
+
+                var possibility = bestPossibilities.Keys.First();
+
+                foreach (var bestPossibility in bestPossibilities)
+                {
+                    currentSum += bestPossibility.Value;
+                    if (!(random <= currentSum)) continue;
+                    possibility = bestPossibility.Key;
+                    break;
+                }
 
                 array[bestI, bestJ] = possibility;
                 positions.Remove((bestI, bestJ));

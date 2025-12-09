@@ -11,6 +11,7 @@ namespace TerrainGeneration.ScriptableObjects
     {
         [field: SerializeField] public List<float> OctaveAmplitudes { get; private set; }
         [field: SerializeField] public List<Biome> Neighbours { get; private set; }
+        [field: SerializeField] public float ClusterFactor { get; private set; }
         [field: SerializeField] private List<LayerHeight> _colors;
 
         public List<LayerValue> GetLayers(float height)
