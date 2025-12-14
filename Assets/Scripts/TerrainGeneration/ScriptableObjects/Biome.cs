@@ -14,21 +14,39 @@ namespace TerrainGeneration.ScriptableObjects
         [field: SerializeField] public float ClusterFactor { get; private set; }
         [field: SerializeField] private List<LayerHeight> _colors;
 
+        private List<LayerValue>[] _cachedColors = new List<LayerValue>[1024];
+
+        private int QuantizeFloat(float value) => Mathf.RoundToInt(1023 * value);
+        
         public List<LayerValue> GetLayers(float height)
         {
+            var index = QuantizeFloat(height);
+            if (_cachedColors[index] != null)
+            {
+                return _cachedColors[index];
+            }
+
             var colorIndex = _colors.FindIndex(color => height >= color.Height);
             if (colorIndex == -1)
-                return new List<LayerValue> { new() { Layer = _colors.Last().Layer, Value = 1f } };
+            {
+                _cachedColors[index] = new List<LayerValue> { new() { Layer = _colors.Last().Layer, Value = 1f } };
+                return _cachedColors[index];
+            }
             if (colorIndex == 0)
-                return new List<LayerValue> { new() { Layer = _colors[colorIndex].Layer, Value = 1f } };
+            {
+                _cachedColors[index] = new List<LayerValue> { new() { Layer = _colors[colorIndex].Layer, Value = 1f } };
+                return _cachedColors[index];
+            }
 
             var t = Mathf.Clamp01((height - _colors[colorIndex].Height) / (_colors[colorIndex - 1].Height - _colors[colorIndex].Height));
 
-            return new List<LayerValue>()
+            _cachedColors[index] = new List<LayerValue>
             {
                 new() { Layer = _colors[colorIndex - 1].Layer, Value = t },
                 new() { Layer = _colors[colorIndex].Layer, Value = 1f - t }
             };
+
+            return _cachedColors[index];
         }
     }
 

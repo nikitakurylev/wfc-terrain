@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using TerrainGeneration.ScriptableObjects;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace TerrainGeneration
@@ -13,12 +15,14 @@ namespace TerrainGeneration
 
         public Biome[,] Generate(int size)
         {
+            var startTime = Time.realtimeSinceStartup;
             for (var i = 0; i < 100; i++)
             {
                 Debug.Log($"WFC Attempt {i + 1}");
 
                 if (TryGenerate(size, out var result))
                 {
+                    Debug.Log($"WFC took {Time.realtimeSinceStartup - startTime} seconds");
                     return result;
                 }
             }
@@ -29,72 +33,61 @@ namespace TerrainGeneration
 
         private bool TryGenerate(int size, out Biome[,] result)
         {
-            var array = new Biome[size, size];
+            var possibilites = new HashSet<Biome>[size, size];
+            for (var i = 0; i < size; i++)
+            for (var j = 0; j < size; j++)
+                possibilites[i, j] = new HashSet<Biome>(_terrainGenerationSettings.Biomes);
+
 
             var positions = new List<(int, int)>(size * size);
             for (var i = 0; i < size * size; i++)
                 positions.Add((i / size, i % size));
-            
+
             Shuffle(positions);
 
-            for (var n = 0; n < size * size; n++)
+            while (positions.Any())
             {
-                var bestPossibilities = new Dictionary<Biome, float>();
-                var bestPossibilitiesCount = 0;
-                int bestI = 0, bestJ = 0;
+                int bestI = -1, bestJ = -1;
                 foreach (var position in positions)
                 {
                     var (i, j) = position;
-                    var scores = _terrainGenerationSettings.Biomes.ToDictionary(b => b, _ => 1f);
-                    for (var k = Mathf.Max(i - 1, 0); k < Mathf.Min(i + 2, size); k++)
-                    for (var l = Mathf.Max(j - 1, 0); l < Mathf.Min(j + 2, size); l++)
-                    {
-                        if (array[k, l] == null)
-                            continue;
-                        
-                        scores[array[k, l]] += array[k, l].ClusterFactor;
-                    }
-                    
-                    for (var k = Mathf.Max(i - 1, 0); k < Mathf.Min(i + 2, size); k++)
-                    for (var l = Mathf.Max(j - 1, 0); l < Mathf.Min(j + 2, size); l++)
-                    {
-                        if (array[k, l] == null)
-                            continue;
 
-                        foreach (var biome in _terrainGenerationSettings.Biomes
-                                     .Where(biome => !array[k, l].Neighbours.Contains(biome)))
-                        {
-                            scores.Remove(biome);
-                        }
-                    }
-
-                    if (!scores.Any())
+                    if (possibilites[i, j].Count == 1)
                         continue;
 
-                    if (bestPossibilitiesCount > 0 && bestPossibilitiesCount <= scores.Count)
+                    if (bestI >= 0 && bestJ >= 0 && possibilites[bestI, bestJ].Count <= possibilites[i, j].Count)
                         continue;
-                    
-                    bestPossibilitiesCount = scores.Count;
-                    bestPossibilities = scores;
+
                     bestI = i;
                     bestJ = j;
                 }
 
-                if (!bestPossibilities.Any())
+                if (!possibilites[bestI, bestJ].Any())
                 {
-                    Debug.LogError($"Failed on step {n}");
+                    Debug.LogError($"Failed with {positions.Count} tiles left");
                     result = null;
                     return false;
                 }
 
-                var scoreSum = bestPossibilities.Values.Sum();
+                var scores = possibilites[bestI, bestJ].ToDictionary(b => b, _ => 1f);
+                for (var k = Mathf.Max(bestI - 1, 0); k < Mathf.Min(bestI + 2, size); k++)
+                for (var l = Mathf.Max(bestJ - 1, 0); l < Mathf.Min(bestJ + 2, size); l++)
+                {
+                    var otherBiome = possibilites[k, l].First();
+                    if (possibilites[k, l].Count > 1 || !scores.ContainsKey(otherBiome))
+                        continue;
+
+                    scores[otherBiome] += otherBiome.ClusterFactor;
+                }
+
+                var scoreSum = scores.Values.Sum();
 
                 var random = Random.Range(0f, scoreSum);
                 var currentSum = 0f;
 
-                var possibility = bestPossibilities.Keys.First();
+                var possibility = possibilites[bestI, bestJ].First();
 
-                foreach (var bestPossibility in bestPossibilities)
+                foreach (var bestPossibility in scores)
                 {
                     currentSum += bestPossibility.Value;
                     if (!(random <= currentSum)) continue;
@@ -102,18 +95,33 @@ namespace TerrainGeneration
                     break;
                 }
 
-                array[bestI, bestJ] = possibility;
+                possibilites[bestI, bestJ].RemoveWhere(p => p != possibility);
                 positions.Remove((bestI, bestJ));
+
+                for (var k = Mathf.Max(bestI - 1, 0); k < Mathf.Min(bestI + 2, size); k++)
+                for (var l = Mathf.Max(bestJ - 1, 0); l < Mathf.Min(bestJ + 2, size); l++)
+                {
+                    if (possibilites[k, l].Count == 1)
+                        continue;
+                    possibilites[k, l].RemoveWhere(p => !p.Neighbours.Contains(possibility));
+                    if (possibilites[k, l].Count == 1)
+                        positions.Remove((k, l));
+                }
             }
 
-            result = array;
+            result = new Biome[size, size];
+            for (var i = 0; i < size; i++)
+            for (var j = 0; j < size; j++)
+                result[i, j] = possibilites[i, j].First();
+
             return true;
         }
-    
+
         private static void Shuffle<T>(IList<T> list)
         {
             var n = list.Count;
-            while (n > 1) {
+            while (n > 1)
+            {
                 n--;
                 var k = Random.Range(0, n + 1);
                 (list[k], list[n]) = (list[n], list[k]);

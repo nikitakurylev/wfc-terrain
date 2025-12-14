@@ -25,6 +25,7 @@ namespace TerrainGeneration
 
         public void GenerateTerrain()
         {
+            var startTime = Time.realtimeSinceStartup;
             _yOffset = terrain.transform.position.y;
 
             var terrainData = terrain.terrainData;
@@ -38,14 +39,6 @@ namespace TerrainGeneration
             var biomeMapSize = _width / settings.BiomeSize + 1;
 
             var biomes = waveFunctionCollapseGenerator.Generate(biomeMapSize);
-            var offsets = new Vector2[biomeMapSize, biomeMapSize];
-            for (int i = 0; i < biomeMapSize; i++)
-            {
-                for (int j = 0; j < biomeMapSize; j++)
-                {
-                    offsets[i, j] = new Vector2(Random.Range(-settings.MaxRandomOffset, settings.MaxRandomOffset), Random.Range(-settings.MaxRandomOffset, settings.MaxRandomOffset));
-                }
-            }
 
             var alphaMaps = new float[terrainData.alphamapResolution, terrainData.alphamapResolution, terrainData.alphamapLayers];
             for (var i = 0; i < _width; i++)
@@ -56,12 +49,6 @@ namespace TerrainGeneration
                 {
                     var verticalT = (j - 1) % settings.BiomeSize / (float)settings.BiomeSize;
                     var biomeY = (j - 1) / settings.BiomeSize;
-                    var offset = BiLerp(
-                        offsets[biomeX, biomeY], 
-                        offsets[biomeX + 1, biomeY],
-                        offsets[biomeX, biomeY + 1], 
-                        offsets[biomeX + 1, biomeY + 1], 
-                        horizontalT, verticalT);
                     _heights[i, j] = 0f;
 
                     var topLeft = biomes[biomeX, biomeY];
@@ -69,36 +56,44 @@ namespace TerrainGeneration
                     var bottomLeft = biomes[biomeX, biomeY + 1];
                     var bottomRight = biomes[biomeX + 1, biomeY + 1];
 
-                    var alphas = BiLerp(
+                    var lerp = BiLerp(
                         new Vector4(1, 0, 0, 0),
                         new Vector4(0, 1, 0, 0),
                         new Vector4(0, 0, 1, 0),
                         new Vector4(0, 0, 0, 1),
-                        horizontalT + offset.X, verticalT + offset.Y
+                        horizontalT, verticalT
                     );
 
-                    for (var octaveIndex = 0; octaveIndex < settings.OctaveScales.Count; octaveIndex++)
+                    var cachedPerlin = new CachedPerlinNoise(i, j);
+                    _heights[i, j] =
+                        lerp.x * topLeft.OctaveAmplitudes[0] +
+                        lerp.y * topRight.OctaveAmplitudes[0] +
+                        lerp.z * bottomLeft.OctaveAmplitudes[0] +
+                        lerp.w * bottomRight.OctaveAmplitudes[0];
+                    for (var octaveIndex = 1; octaveIndex < settings.OctaveScales.Count; octaveIndex++)
                     {
                         var octaveScale = settings.OctaveScales[octaveIndex];
-                        var biomeFactor = BiLerp(
-                            topLeft.OctaveAmplitudes[octaveIndex],
-                            topRight.OctaveAmplitudes[octaveIndex],
-                            bottomLeft.OctaveAmplitudes[octaveIndex],
-                            bottomRight.OctaveAmplitudes[octaveIndex],
-                            horizontalT + offset.X, verticalT + offset.Y);
-                        _heights[i, j] += octaveIndex == 0 ? biomeFactor : Mathf.PerlinNoise(i * octaveScale, j * octaveScale) * biomeFactor;
+                        if(octaveScale == 0)
+                            continue;
+                        var biomeFactor =
+                            lerp.x * topLeft.OctaveAmplitudes[octaveIndex] +
+                            lerp.y * topRight.OctaveAmplitudes[octaveIndex] +
+                            lerp.z * bottomLeft.OctaveAmplitudes[octaveIndex] +
+                            lerp.w * bottomRight.OctaveAmplitudes[octaveIndex];
+                        _heights[i, j] += cachedPerlin.GetValue(octaveScale) * biomeFactor;
                     }
 
                     if (i < terrainData.alphamapResolution && j < terrainData.alphamapResolution)
                     {
-                        AddTerrainLayerAlpha(alphaMaps, i, j, alphas.x, layers, topLeft, _heights[i, j]);
-                        AddTerrainLayerAlpha(alphaMaps, i, j, alphas.y, layers, topRight, _heights[i, j]);
-                        AddTerrainLayerAlpha(alphaMaps, i, j, alphas.z, layers, bottomLeft, _heights[i, j]);
-                        AddTerrainLayerAlpha(alphaMaps, i, j, alphas.w, layers, bottomRight, _heights[i, j]);
+                        AddTerrainLayerAlpha(alphaMaps, i, j, lerp.x, layers, topLeft, _heights[i, j]);
+                        AddTerrainLayerAlpha(alphaMaps, i, j, lerp.y, layers, topRight, _heights[i, j]);
+                        AddTerrainLayerAlpha(alphaMaps, i, j, lerp.z, layers, bottomLeft, _heights[i, j]);
+                        AddTerrainLayerAlpha(alphaMaps, i, j, lerp.w, layers, bottomRight, _heights[i, j]);
                     }
                 }
             }
 
+            Debug.Log($"Terrain Generation took {Time.realtimeSinceStartup - startTime} seconds");
             terrain.terrainData.SetHeights(0, 0, _heights);
 
             terrain.terrainData.SetAlphamaps(0, 0, alphaMaps);
