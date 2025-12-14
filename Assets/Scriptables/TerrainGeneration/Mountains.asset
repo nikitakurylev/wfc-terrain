@@ -22,7 +22,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bf6fd255e1c75c64bb06d6c6b06ec8e4, type: 2}
   - {fileID: 11400000}
   - {fileID: 11400000, guid: ac5e05cf983e0914e80a5d9293aabe72, type: 2}
-  <ClusterFactor>k__BackingField: 0
+  - {fileID: 11400000, guid: 2563802df6afdb24bb7f05616906a514, type: 2}
+  <ClusterFactor>k__BackingField: 2
   _colors:
   - <Height>k__BackingField: 0.605
     <Layer>k__BackingField: {fileID: 8574412962073106934, guid: 7d5eaeba361c0e74799d0d51f94931df, type: 2}

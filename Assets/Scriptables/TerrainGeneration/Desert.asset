@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f8e460156954a3a98f6ccb5fa652b34, type: 3}
+  m_Name: Desert
+  m_EditorClassIdentifier: 
+  <OctaveAmplitudes>k__BackingField:
+  - 0.5001
+  - 0.005
+  - 0.02
+  - 0
+  - 0
+  <Neighbours>k__BackingField:
+  - {fileID: 11400000, guid: bf6fd255e1c75c64bb06d6c6b06ec8e4, type: 2}
+  - {fileID: 11400000}
+  <ClusterFactor>k__BackingField: 10
+  _colors:
+  - <Height>k__BackingField: 0.54
+    <Layer>k__BackingField: {fileID: 8574412962073106934, guid: 35881cac43e7c464db23778a9b07786c, type: 2}
+  - <Height>k__BackingField: 0.525
+    <Layer>k__BackingField: {fileID: 8574412962073106934, guid: 1a7381ed0bbe133498bc1bf1b6bf2049, type: 2}
