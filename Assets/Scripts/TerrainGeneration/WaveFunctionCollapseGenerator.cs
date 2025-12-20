@@ -13,14 +13,14 @@ namespace TerrainGeneration
     {
         [SerializeField] private TerrainGenerationSettings _terrainGenerationSettings;
 
-        public Biome[,] Generate(int size)
+        public Biome[,] GenerateBiomes(int size)
         {
             var startTime = Time.realtimeSinceStartup;
             for (var i = 0; i < 100; i++)
             {
                 Debug.Log($"WFC Attempt {i + 1}");
 
-                if (TryGenerate(size, out var result))
+                if (TryGenerateBiomes(size, out var result))
                 {
                     Debug.Log($"WFC took {Time.realtimeSinceStartup - startTime} seconds");
                     return result;
@@ -31,7 +31,7 @@ namespace TerrainGeneration
             return null;
         }
 
-        private bool TryGenerate(int size, out Biome[,] result)
+        private bool TryGenerateBiomes(int size, out Biome[,] result)
         {
             var possibilites = new HashSet<Biome>[size, size];
             for (var i = 0; i < size; i++)

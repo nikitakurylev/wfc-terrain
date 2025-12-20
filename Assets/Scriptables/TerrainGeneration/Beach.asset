@@ -26,3 +26,9 @@ MonoBehaviour:
   _colors:
   - <Height>k__BackingField: 0
     <Layer>k__BackingField: {fileID: 8574412962073106934, guid: 45b265cd35bc74788a8a29718f5479da, type: 2}
+  _color1:
+    <Height>k__BackingField: 0
+    <Layer>k__BackingField: {fileID: 8574412962073106934, guid: 45b265cd35bc74788a8a29718f5479da, type: 2}
+  _color2:
+    <Height>k__BackingField: 0
+    <Layer>k__BackingField: {fileID: 8574412962073106934, guid: 45b265cd35bc74788a8a29718f5479da, type: 2}

@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
 using UnityEngine;
 
 namespace TerrainGeneration.ScriptableObjects
@@ -12,41 +10,15 @@ namespace TerrainGeneration.ScriptableObjects
         [field: SerializeField] public List<float> OctaveAmplitudes { get; private set; }
         [field: SerializeField] public List<Biome> Neighbours { get; private set; }
         [field: SerializeField] public float ClusterFactor { get; private set; }
-        [field: SerializeField] private List<LayerHeight> _colors;
+        [field: SerializeField] private LayerHeight _color1;
+        [field: SerializeField] private LayerHeight _color2;
 
-        private List<LayerValue>[] _cachedColors = new List<LayerValue>[1024];
-
-        private int QuantizeFloat(float value) => Mathf.RoundToInt(1023 * value);
+        public int Color1 => _color1.LayerIndex;
+        public int Color2 => _color2.LayerIndex;
         
-        public List<LayerValue> GetLayers(float height)
+        public float GetColorInterpolation(float height)
         {
-            var index = QuantizeFloat(height);
-            if (_cachedColors[index] != null)
-            {
-                return _cachedColors[index];
-            }
-
-            var colorIndex = _colors.FindIndex(color => height >= color.Height);
-            if (colorIndex == -1)
-            {
-                _cachedColors[index] = new List<LayerValue> { new() { Layer = _colors.Last().Layer, Value = 1f } };
-                return _cachedColors[index];
-            }
-            if (colorIndex == 0)
-            {
-                _cachedColors[index] = new List<LayerValue> { new() { Layer = _colors[colorIndex].Layer, Value = 1f } };
-                return _cachedColors[index];
-            }
-
-            var t = Mathf.Clamp01((height - _colors[colorIndex].Height) / (_colors[colorIndex - 1].Height - _colors[colorIndex].Height));
-
-            _cachedColors[index] = new List<LayerValue>
-            {
-                new() { Layer = _colors[colorIndex - 1].Layer, Value = t },
-                new() { Layer = _colors[colorIndex].Layer, Value = 1f - t }
-            };
-
-            return _cachedColors[index];
+            return Mathf.InverseLerp(_color1.Height, _color2.Height, height);
         }
     }
 
@@ -54,12 +26,6 @@ namespace TerrainGeneration.ScriptableObjects
     public class LayerHeight
     {
         [field: SerializeField] public float Height { get; private set; }
-        [field: SerializeField] public TerrainLayer Layer { get; private set; }
-    }
-
-    public class LayerValue
-    {
-        public TerrainLayer Layer { get; set; }
-        public float Value { get; set; }
+        [field: SerializeField] public int LayerIndex { get; private set; }
     }
 }

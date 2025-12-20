@@ -25,8 +25,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 984a2306cf62c8f43b605dac00c6e1bf, type: 2}
   - {fileID: 11400000, guid: 2563802df6afdb24bb7f05616906a514, type: 2}
   <ClusterFactor>k__BackingField: 10
-  _colors:
-  - <Height>k__BackingField: 0.53
-    <Layer>k__BackingField: {fileID: 8574412962073106934, guid: 35881cac43e7c464db23778a9b07786c, type: 2}
-  - <Height>k__BackingField: 0.52
+  _color1:
+    <Height>k__BackingField: 0.52
     <Layer>k__BackingField: {fileID: 8574412962073106934, guid: 1b338ac65c4f49741b959337bbe59d77, type: 2}
+    <LayerIndex>k__BackingField: 3
+  _color2:
+    <Height>k__BackingField: 0.53
+    <Layer>k__BackingField: {fileID: 8574412962073106934, guid: 35881cac43e7c464db23778a9b07786c, type: 2}
+    <LayerIndex>k__BackingField: 1
