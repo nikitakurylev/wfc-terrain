@@ -4,11 +4,12 @@ using UnityEngine;
 namespace TerrainGeneration.ScriptableObjects
 {
     [CreateAssetMenu(fileName = "Terrain Generation Settings", menuName = "Terrain Generation/Terrain Generation Settings", order = 1)]
-    public class TerrainGenerationSettings : ScriptableObject
+    public class TerrainGenerationSettings : ScriptableObject, ITerrainGenerationSettings
     {
-        [field:SerializeField] public int BiomeSize { get; private set; }
-        [field:SerializeField] public List<Biome> Biomes { get; private set; }
-        [field:SerializeField] public AnimationCurve InterpolationCurve { get; private set; }
+        [field: SerializeField] public int Size { get; set; } = 1024;
+        [field:SerializeField] public int BiomeSize { get; set; }
+        [field:SerializeField] public List<Biome> Biomes { get; set; }
+        [field:SerializeField] public AnimationCurve InterpolationCurve { get; set; }
         [field:SerializeField] public List<float> OctaveScales { get; private set; }
     }
 }
