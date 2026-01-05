@@ -451,7 +451,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _terrain: {fileID: 1524920041}
-  _settings: {fileID: 11400000, guid: 532f7e9d40dbd0f49a06931ea0094fde, type: 2}
+  _threeBiomes: {fileID: 11400000, guid: 1ff2d85912155014a8c568acb645805d, type: 2}
+  _sevenBiomes: {fileID: 11400000, guid: 532f7e9d40dbd0f49a06931ea0094fde, type: 2}
   _startExperiments: 0
 --- !u!1 &832575517
 GameObject:

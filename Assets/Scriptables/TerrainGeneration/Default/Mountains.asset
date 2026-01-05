@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f8e460156954a3a98f6ccb5fa652b34, type: 3}
+  m_Name: Mountains
+  m_EditorClassIdentifier: 
+  <OctaveAmplitudes>k__BackingField:
+  - 0.5001
+  - 0.05
+  - 0.1
+  - 0.02
+  - 0
+  <Neighbours>k__BackingField:
+  - {fileID: 11400000, guid: bf6fd255e1c75c64bb06d6c6b06ec8e4, type: 2}
+  - {fileID: 11400000}
+  - {fileID: 11400000, guid: ac5e05cf983e0914e80a5d9293aabe72, type: 2}
+  - {fileID: 11400000, guid: 2563802df6afdb24bb7f05616906a514, type: 2}
+  <ClusterFactor>k__BackingField: 2
+  _color1:
+    <Height>k__BackingField: 0.6
+    <Layer>k__BackingField: {fileID: 8574412962073106934, guid: 35881cac43e7c464db23778a9b07786c, type: 2}
+    <LayerIndex>k__BackingField: 1
+  _color2:
+    <Height>k__BackingField: 0.605
+    <Layer>k__BackingField: {fileID: 8574412962073106934, guid: 7d5eaeba361c0e74799d0d51f94931df, type: 2}
+    <LayerIndex>k__BackingField: 6

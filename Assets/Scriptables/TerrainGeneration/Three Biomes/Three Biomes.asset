@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbbb88fb121441d7a75be841ea7baeda, type: 3}
+  m_Name: Three Biomes
+  m_EditorClassIdentifier: 
+  <Size>k__BackingField: 1024
+  <BiomeSize>k__BackingField: 32
+  <Biomes>k__BackingField:
+  - {fileID: 11400000, guid: 95e17debc47a1be4fa7558792ce70942, type: 2}
+  - {fileID: 11400000, guid: 200aeffb4e9f7064995afcef7010af0c, type: 2}
+  - {fileID: 11400000, guid: 8eaad1d9c858a914594f189df069e2d9, type: 2}
+  <InterpolationCurve>k__BackingField:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  <OctaveScales>k__BackingField:
+  - 0
+  - 0.1
+  - 0.05
+  - 0.5
+  - 0.1

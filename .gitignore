@@ -43,3 +43,7 @@ sysinfo.txt
 *.unitypackage
 UserSettings
 test.csv
+biomeSize3biomes.csv
+biomeSize7biomes.csv
+terrainSize3biomes.csv
+terrainSize7biomes.csv
