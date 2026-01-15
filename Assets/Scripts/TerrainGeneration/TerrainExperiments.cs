@@ -14,7 +14,7 @@ namespace TerrainGeneration
         
         private TerrainGenerationSettings _settings;
 
-        [InspectorButton("StartExperiments")] public bool _startExperiments;
+        [InspectorButton("StartExperiments", ButtonWidth = 120)] public bool _startExperiments;
 
         void StartExperiments()
         {

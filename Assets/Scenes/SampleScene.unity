@@ -178,10 +178,10 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 2000
   field of view: 60
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 2000
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -205,13 +205,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 2000, y: 100, z: 2000}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -389,8 +389,9 @@ GameObject:
   - component: {fileID: 787335081}
   - component: {fileID: 787335084}
   - component: {fileID: 787335085}
+  - component: {fileID: 787335086}
   m_Layer: 0
-  m_Name: VillageGenerator
+  m_Name: Generator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -408,7 +409,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d543a02f4c644f3d9e6c37ceb6ab7fab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  terrainManager: {fileID: 1524920041}
+  terrainManager: {fileID: 787335086}
   generate: 0
 --- !u!4 &787335083
 Transform:
@@ -450,10 +451,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d874dec72f4a20d45a57cc1cbf8afa88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _terrain: {fileID: 1524920041}
+  _terrain: {fileID: 0}
   _threeBiomes: {fileID: 11400000, guid: 1ff2d85912155014a8c568acb645805d, type: 2}
   _sevenBiomes: {fileID: 11400000, guid: 532f7e9d40dbd0f49a06931ea0094fde, type: 2}
   _startExperiments: 0
+--- !u!114 &787335086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787335080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b89943123a6204910a6100c97e4caad3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _terrain: {fileID: 1524920043}
+  _waveFunctionCollapse: {fileID: 787335084}
+  _settings: {fileID: 11400000, guid: 532f7e9d40dbd0f49a06931ea0094fde, type: 2}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -514,7 +530,6 @@ GameObject:
   - component: {fileID: 1524920044}
   - component: {fileID: 1524920043}
   - component: {fileID: 1524920042}
-  - component: {fileID: 1524920041}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Untagged
@@ -522,21 +537,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
   m_IsActive: 1
---- !u!114 &1524920041
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1524920040}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b89943123a6204910a6100c97e4caad3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _terrain: {fileID: 1524920043}
-  _waveFunctionCollapse: {fileID: 787335084}
-  _settings: {fileID: 11400000, guid: 532f7e9d40dbd0f49a06931ea0094fde, type: 2}
 --- !u!154 &1524920042
 TerrainCollider:
   m_ObjectHideFlags: 0
