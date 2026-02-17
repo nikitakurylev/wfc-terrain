@@ -11,5 +11,6 @@ namespace TerrainGeneration.ScriptableObjects
         [field:SerializeField] public List<Biome> Biomes { get; set; }
         [field:SerializeField] public AnimationCurve InterpolationCurve { get; set; }
         [field:SerializeField] public List<float> OctaveScales { get; private set; }
+        [field:SerializeField] public InterpolatorType InterpolatorType { get; private set; }
     }
 }
