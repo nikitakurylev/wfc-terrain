@@ -23,6 +23,7 @@ namespace TerrainGeneration
         private TerrainGenerationSettings _settings;
 
         public float TileScale { get; private set; }
+        public float ScaledBiomeSize { get; private set; }
 
         public float TotalTime { get; private set; }
         public float WfcTime { get; private set; }
@@ -50,6 +51,7 @@ namespace TerrainGeneration
             int width = settings.Size;
             int length = settings.Size;
             TileScale = terrainData.size.x / width;
+            ScaledBiomeSize = TileScale * _settings.BiomeSize;
             var biomeMapSize = Mathf.CeilToInt(1f * width / settings.BiomeSize) + 1;
 
             WfcTime = Time.realtimeSinceStartup;
@@ -115,6 +117,26 @@ namespace TerrainGeneration
             TotalTime = Time.realtimeSinceStartup - startTime;
             PerlinTime = TotalTime - PaintTime - WfcTime;
             Debug.Log(TotalTime);
+        }
+
+        public void RegenerateTerrain(Vector2Int from, Vector2Int to)
+        {
+            var startX = from.x * _settings.BiomeSize;
+            var endX = to.x * _settings.BiomeSize;
+            var startY = from.y * _settings.BiomeSize;
+            var endY = to.y * _settings.BiomeSize;
+            var sizeX = endX - startX;
+            var sizeY = endY - startY;
+
+            float[,] heights = new float[sizeY, sizeX];
+            
+            for (int i = 0; i < sizeX; i++)
+            for (int j = 0; j < sizeY; j++)
+            {
+                
+            }
+            
+            _terrain.terrainData.SetHeights(startX, startY, heights);
         }
 
         private void AddTerrainLayerAlpha(float[,,] alphaMaps, int i, int j, float biomeStrength, Biome biome, float height)
