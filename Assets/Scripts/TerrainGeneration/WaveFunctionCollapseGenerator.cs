@@ -15,26 +15,51 @@ namespace TerrainGeneration
 
         public Biome[,] GenerateBiomes(int size)
         {
+            var result = new Biome[size, size];
+
+            return GenerateBiomes(result) ? result : null;
+        }
+        
+        public bool GenerateBiomes(Biome[,] result)
+        {
             for (var i = 0; i < 100; i++)
             {
-                if (TryGenerateBiomes(size, out var result))
-                    return result;
+                if (TryGenerateBiomes(result))
+                    return true;
             }
 
             Debug.LogError("WFC failed");
-            return null;
+            return false;
         }
 
-        private bool TryGenerateBiomes(int size, out Biome[,] result)
+        private bool TryGenerateBiomes(Biome[,] result)
         {
+            var size = result.GetLength(0);
             var possibilites = new HashSet<Biome>[size, size];
+            
+            var positions = new List<(int, int)>(size * size);
+
             for (var i = 0; i < size; i++)
             for (var j = 0; j < size; j++)
-                possibilites[i, j] = new HashSet<Biome>(_terrainGenerationSettings.Biomes);
-
-            var positions = new List<(int, int)>(size * size);
-            for (var i = 0; i < size * size; i++)
-                positions.Add((i / size, i % size));
+            {
+                if (result[i, j] == null)
+                {
+                    possibilites[i, j] = new HashSet<Biome>(_terrainGenerationSettings.Biomes);
+                    positions.Add((i, j));
+                    
+                    for (var k = Mathf.Max(i - 1, 0); k < Mathf.Min(i + 2, size); k++)
+                    for (var l = Mathf.Max(j - 1, 0); l < Mathf.Min(j + 2, size); l++)
+                    {
+                        if (result[k, l] == null)
+                            continue;
+                        possibilites[i, j].RemoveWhere(p => !p.Neighbours.Contains(result[k, l]));
+                    }
+                }
+                else
+                {
+                    possibilites[i, j] = new HashSet<Biome>() { result[i, j] };
+                }
+            }
 
             Shuffle(positions);
 
@@ -53,6 +78,12 @@ namespace TerrainGeneration
 
                     bestI = i;
                     bestJ = j;
+                }
+
+                if (bestI == -1)
+                {
+                    if (positions.All(p => possibilites[p.Item1, p.Item2].Count == 1))
+                        break;
                 }
 
                 if (!possibilites[bestI, bestJ].Any())
@@ -102,7 +133,6 @@ namespace TerrainGeneration
                 }
             }
 
-            result = new Biome[size, size];
             for (var i = 0; i < size; i++)
             for (var j = 0; j < size; j++)
                 result[i, j] = possibilites[i, j].First();
