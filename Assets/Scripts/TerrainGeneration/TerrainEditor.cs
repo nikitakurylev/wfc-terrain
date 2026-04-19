@@ -22,8 +22,8 @@ namespace TerrainGeneration
                 var bottomLeft = new Vector2Int(Mathf.Min(_position1.x, _position2.x),
                     Mathf.Min(_position1.y, _position2.y));
 
-                var topRight = new Vector2Int(Mathf.Max(_position1.x, _position2.x),
-                    Mathf.Max(_position1.y, _position2.y));
+                var topRight = new Vector2Int(Mathf.Max(_position1.x, _position2.x) + 1,
+                    Mathf.Max(_position1.y, _position2.y) + 1);
 
                 transform.position =
                     new Vector3((_position1.x + _position2.x) / 2f, 0, (_position1.y + _position2.y) / 2f) * _terrainManager.ScaledBiomeSize;

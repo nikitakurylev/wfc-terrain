@@ -83,17 +83,17 @@ namespace TerrainGeneration
             for (int i = from.x; i < to.x; i++)
             for (int j = from.y; j < to.y; j++)
             {
-                //biomes[i, j] = _settings.Biomes[0];
+                biomes[j, i] = _settings.Biomes[0];
             }
             
-            var startX = from.x * _settings.BiomeSize;
+            var startX = (from.x - 1) * _settings.BiomeSize;
             var endX = to.x * _settings.BiomeSize;
-            var startY = from.y * _settings.BiomeSize;
+            var startY = (from.y - 1) * _settings.BiomeSize;
             var endY = to.y * _settings.BiomeSize;
             var sizeX = endX - startX;
             var sizeY = endY - startY;
 
-            GenerateHeightMap(_settings, startX, startY, sizeX, sizeY);
+            GenerateHeightMap(_settings, startX, startY, sizeY, sizeX);
         }
 
         private void GenerateHeightMap(ITerrainGenerationSettings settings,
@@ -120,8 +120,8 @@ namespace TerrainGeneration
                 {
                     heights[i, j] = 0f;
 
-                    var x = startX + i;
-                    var y = startY + j;
+                    var x = startY + i;
+                    var y = startX + j;
 
                     var weights = interpolator.ComputeWeights(new Vector2Int(x, y));
 
