@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TerrainGeneration.Interpolators;
@@ -35,10 +36,10 @@ namespace TerrainGeneration
         
         public void GenerateTerrain()
         {
-            GenerateTerrain(_settings);
+            StartCoroutine(GenerateTerrain(_settings));
         }
 
-        public void GenerateTerrain(ITerrainGenerationSettings settings)
+        public IEnumerator GenerateTerrain(ITerrainGenerationSettings settings)
         {
             TotalTime = 0;
             WfcTime = 0;
@@ -69,7 +70,7 @@ namespace TerrainGeneration
 
             WfcTime = Time.realtimeSinceStartup - WfcTime;
 
-            GenerateHeightMap(settings, 0, 0, width, length);
+            yield return GenerateHeightMap(settings, 0, 0, width, length);
 
             TotalTime = Time.realtimeSinceStartup - startTime;
             PerlinTime = TotalTime - PaintTime - WfcTime;
@@ -78,13 +79,13 @@ namespace TerrainGeneration
 
         public void RegenerateTerrain(Vector2Int from, Vector2Int to)
         {
-            
-            
             for (int i = from.x; i < to.x; i++)
             for (int j = from.y; j < to.y; j++)
             {
-                biomes[j, i] = _settings.Biomes[0];
+                biomes[j, i] = null;
             }
+
+            _waveFunctionCollapse.GenerateBiomes(biomes);
             
             var startX = (from.x - 1) * _settings.BiomeSize;
             var endX = to.x * _settings.BiomeSize;
@@ -93,10 +94,10 @@ namespace TerrainGeneration
             var sizeX = endX - startX;
             var sizeY = endY - startY;
 
-            GenerateHeightMap(_settings, startX, startY, sizeY, sizeX);
+            StartCoroutine(GenerateHeightMap(_settings, startX, startY, sizeY, sizeX));
         }
 
-        private void GenerateHeightMap(ITerrainGenerationSettings settings,
+        private IEnumerator GenerateHeightMap(ITerrainGenerationSettings settings,
             int startX, int startY, int width, int length)
         {
             ITerrainInterpolator interpolator = settings.InterpolatorType switch
@@ -114,6 +115,7 @@ namespace TerrainGeneration
                 terrainData.alphamapLayers];
             var heights = new float[width, length];
 
+            var generationTime = Time.realtimeSinceStartup;
             for (var i = 0; i < width; i++)
             {
                 for (var j = 0; j < length; j++)
@@ -147,6 +149,13 @@ namespace TerrainGeneration
                     }
 
                     PaintTime += Time.realtimeSinceStartup - localPaintTime;
+                    if (Time.realtimeSinceStartup - generationTime > 1)
+                    {
+                        generationTime = Time.realtimeSinceStartup;
+                        _terrain.terrainData.SetHeights(startX, startY, heights);
+                        _terrain.terrainData.SetAlphamaps(startX, startY, alphaMaps);
+                        yield return new WaitForEndOfFrame();
+                    }
                 }
             }
 
