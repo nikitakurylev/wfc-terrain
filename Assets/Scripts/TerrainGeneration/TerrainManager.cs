@@ -25,6 +25,7 @@ namespace TerrainGeneration
 
         public float TileScale { get; private set; }
         public float ScaledBiomeSize { get; private set; }
+        public IReadOnlyList<Biome> PossibleBiomes => _settings.Biomes;
 
         public float TotalTime { get; private set; }
         public float WfcTime { get; private set; }
@@ -76,8 +77,8 @@ namespace TerrainGeneration
             PerlinTime = TotalTime - PaintTime - WfcTime;
             Debug.Log(TotalTime);
         }
-
-        public void RegenerateTerrain(Vector2Int from, Vector2Int to)
+        
+        public void ClearTerrain(Vector2Int from, Vector2Int to)
         {
             for (int i = from.x; i < to.x; i++)
             for (int j = from.y; j < to.y; j++)
@@ -85,6 +86,43 @@ namespace TerrainGeneration
                 biomes[j, i] = null;
             }
 
+            var startX = (from.x - 1) * _settings.BiomeSize;
+            var endX = to.x * _settings.BiomeSize;
+            var startY = (from.y - 1) * _settings.BiomeSize;
+            var endY = to.y * _settings.BiomeSize;
+            var sizeX = endX - startX;
+            var sizeY = endY - startY;
+            var terrainData = _terrain.terrainData;
+            
+            var alphaMaps = new float[Mathf.Min(terrainData.alphamapResolution, sizeY),
+                Mathf.Min(terrainData.alphamapResolution, sizeX),
+                terrainData.alphamapLayers];
+            var heights = new float[sizeY, sizeX];
+
+            _terrain.terrainData.SetHeights(startX, startY, heights);
+            _terrain.terrainData.SetAlphamaps(startX, startY, alphaMaps);
+        }
+        
+        public void PaintTerrain(Biome biome, Vector2Int from, Vector2Int to)
+        {
+            for (int i = from.x; i < to.x; i++)
+            for (int j = from.y; j < to.y; j++)
+            {
+                biomes[j, i] = biome;
+            }
+
+            var startX = (from.x - 1) * _settings.BiomeSize;
+            var endX = to.x * _settings.BiomeSize;
+            var startY = (from.y - 1) * _settings.BiomeSize;
+            var endY = to.y * _settings.BiomeSize;
+            var sizeX = endX - startX;
+            var sizeY = endY - startY;
+
+            StartCoroutine(GenerateHeightMapOneBiome(_settings, biome, startX, startY, sizeY, sizeX));
+        }
+
+        public void RegenerateTerrain(Vector2Int from, Vector2Int to)
+        {
             _waveFunctionCollapse.GenerateBiomes(biomes);
             
             var startX = (from.x - 1) * _settings.BiomeSize;
@@ -146,6 +184,58 @@ namespace TerrainGeneration
                         {
                             AddTerrainLayerAlpha(alphaMaps, i, j, weight.Value, weight.Key, height);
                         }
+                    }
+
+                    PaintTime += Time.realtimeSinceStartup - localPaintTime;
+                    if (Time.realtimeSinceStartup - generationTime > 1)
+                    {
+                        generationTime = Time.realtimeSinceStartup;
+                        _terrain.terrainData.SetHeights(startX, startY, heights);
+                        _terrain.terrainData.SetAlphamaps(startX, startY, alphaMaps);
+                        yield return new WaitForEndOfFrame();
+                    }
+                }
+            }
+
+            _terrain.terrainData.SetHeights(startX, startY, heights);
+            _terrain.terrainData.SetAlphamaps(startX, startY, alphaMaps);
+        }
+
+        private IEnumerator GenerateHeightMapOneBiome(ITerrainGenerationSettings settings, Biome biome,
+            int startX, int startY, int width, int length)
+        {
+            var terrainData = _terrain.terrainData;
+            var alphaMaps = new float[Mathf.Min(terrainData.alphamapResolution, width),
+                Mathf.Min(terrainData.alphamapResolution, length),
+                terrainData.alphamapLayers];
+            var heights = new float[width, length];
+
+            var generationTime = Time.realtimeSinceStartup;
+            for (var i = 0; i < width; i++)
+            {
+                for (var j = 0; j < length; j++)
+                {
+                    heights[i, j] = 0f;
+
+                    var x = startY + i;
+                    var y = startX + j;
+
+
+                    var cachedPerlin = new CachedPerlinNoise(x, y);
+                    heights[i, j] = biome.OctaveAmplitudes[0];
+                    for (var octaveIndex = 1; octaveIndex < settings.OctaveScales.Count; octaveIndex++)
+                    {
+                        var octaveScale = settings.OctaveScales[octaveIndex];
+                        if (octaveScale == 0)
+                            continue;
+                        heights[i, j] += cachedPerlin.GetValue(octaveScale) * biome.OctaveAmplitudes[octaveIndex];
+                    }
+
+                    var localPaintTime = Time.realtimeSinceStartup;
+                    if (x < terrainData.alphamapResolution && y < terrainData.alphamapResolution)
+                    {
+                        var height = heights[i, j];
+                        AddTerrainLayerAlpha(alphaMaps, i, j, 1, biome, height);
                     }
 
                     PaintTime += Time.realtimeSinceStartup - localPaintTime;
