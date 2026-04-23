@@ -28,7 +28,7 @@ namespace TerrainGeneration
             }
         }
 
-        public Dictionary<Biome, float> ComputeWeights(Vector2Int p)
+        public (Biome, float)[] ComputeWeights(Vector2Int p)
         {
             var neighbours = _neighbours[(p.x - 1) / _biomeSize, (p.y - 1) / _biomeSize];
 
@@ -44,11 +44,12 @@ namespace TerrainGeneration
                     break;
             }
 
-            Dictionary<Biome, float> areas = new();
+            var areas = new(Biome, float)[neighbours.Count];
             float total = 0f;
 
-            foreach (var n in neighbours)
+            for (var i = 0; i < neighbours.Count; i++)
             {
+                var n = neighbours[i];
                 var subCell = new List<Vector2>(cell);
 
                 foreach (var other in neighbours)
@@ -69,18 +70,14 @@ namespace TerrainGeneration
 
                 if (a > 0)
                 {
-                    if (!areas.ContainsKey(n.biome))
-                        areas[n.biome] = 0;
-
-                    areas[n.biome] += a;
+                    areas[i] = (n.biome, a);
                     total += a;
                 }
             }
 
             // Normalize
-            var keys = new List<Biome>(areas.Keys);
-            foreach (var k in keys)
-                areas[k] /= total;
+            for (var i = 0; i < neighbours.Count; i++)
+                areas[i].Item2 /= total;
 
             return areas;
         }

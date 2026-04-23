@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using TerrainGeneration.ScriptableObjects;
 using UnityEngine;
 
@@ -16,7 +15,7 @@ namespace TerrainGeneration.Interpolators
             _biomeSize = biomeSize;
             _interpolationCurve = interpolationCurve;
         }
-        public Dictionary<Biome, float> ComputeWeights(Vector2Int position)
+        public (Biome, float)[] ComputeWeights(Vector2Int position)
         {
             var horizontalT = (position.x - 1) % _biomeSize / (float)_biomeSize;
             var biomeX = (position.x - 1) / _biomeSize;
@@ -30,29 +29,13 @@ namespace TerrainGeneration.Interpolators
 
             var lerp = BiLerp(horizontalT, verticalT);
 
-            var result = new Dictionary<Biome, float>();
-
-            if(result.ContainsKey(topLeft))
-                result[topLeft] += lerp.x;
-            else
-                result[topLeft] = lerp.x;
-
-            if(result.ContainsKey(topRight))
-                result[topRight] += lerp.y;
-            else
-                result[topRight] = lerp.y;
-
-            if(result.ContainsKey(bottomLeft))
-                result[bottomLeft] += lerp.z;
-            else
-                result[bottomLeft] = lerp.z;
-
-            if(result.ContainsKey(bottomRight))
-                result[bottomRight] += lerp.w;
-            else
-                result[bottomRight] = lerp.w;
-
-            return result;
+            return new[]
+            {
+                (topLeft, lerp.x),
+                (topRight, lerp.y),
+                (bottomLeft, lerp.z),
+                (bottomRight, lerp.w)
+            };
         }
 
         private Vector4 BiLerp(float horizontalT, float verticalT)

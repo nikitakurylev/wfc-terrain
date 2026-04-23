@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TerrainGeneration.ScriptableObjects;
 using UnityEngine;
@@ -23,15 +24,15 @@ namespace TerrainGeneration.Interpolators
             _triangulation = new DelaunayTriangulation(vertices);
         }
 
-        public Dictionary<Biome, float> ComputeWeights(Vector2Int p)
+        public (Biome, float)[] ComputeWeights(Vector2Int p)
         {
             var triangle = _triangulation.FindContainingTriangle(p);
             if (!triangle.HasValue)
-                return new Dictionary<Biome, float>();
+                return Array.Empty<(Biome, float)>();
             var t = triangle.Value;
 
             if (t.a.biome == t.b.biome && t.b.biome == t.c.biome)
-                return new Dictionary<Biome, float> { { t.a.biome, 1f } };
+                return new (Biome, float)[] { (t.a.biome, 1f) };
             
             Vector2 a = t.a.position;
             Vector2 b = t.b.position;
@@ -42,21 +43,13 @@ namespace TerrainGeneration.Interpolators
             float w1 = Cross(b - p, c - p) / area;
             float w2 = Cross(c - p, a - p) / area;
             float w3 = 1f - w1 - w2;
-            var dict = new Dictionary<Biome, float>();
 
-            // Add t.a
-            if (!dict.TryAdd(t.a.biome, w1))
-                dict[t.a.biome] += w1;
-
-            // Add t.b
-            if (!dict.TryAdd(t.b.biome, w2))
-                dict[t.b.biome] += w2;
-
-            // Add t.c
-            if (!dict.TryAdd(t.c.biome, w3))
-                dict[t.c.biome] += w3;
-
-            return dict;
+            return new []
+            {
+                (t.a.biome, w1),
+                (t.b.biome, w2),
+                (t.c.biome, w3),
+            };
         }
 
         static float Cross(Vector2 v1, Vector2 v2)

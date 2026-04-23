@@ -1127,10 +1127,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d874dec72f4a20d45a57cc1cbf8afa88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _terrain: {fileID: 0}
+  _terrain: {fileID: 787335086}
   _threeBiomes: {fileID: 11400000, guid: 1ff2d85912155014a8c568acb645805d, type: 2}
   _sevenBiomes: {fileID: 11400000, guid: 532f7e9d40dbd0f49a06931ea0094fde, type: 2}
   _startExperiments: 0
+  _stopExperiments: 0
 --- !u!114 &787335086
 MonoBehaviour:
   m_ObjectHideFlags: 0
