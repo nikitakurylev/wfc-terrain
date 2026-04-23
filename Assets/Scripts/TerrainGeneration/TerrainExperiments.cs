@@ -64,7 +64,7 @@ namespace TerrainGeneration
 
         void RunExperimentAndWriteResult(StreamWriter file, int i, int size, int biomeSize, InterpolatorType interpolatorType)
         {
-            float avgWfc = 0, avgPerlin = 0, avgPaint = 0, avgTotal = 0;
+            float avgWfc = 0, avgPerlin = 0, avgTotal = 0;
             for (int j = 0; j < TestsPerStep; j++)
             {
                 _terrain.GenerateTerrain(new MockTerrainGenerationSettings()
@@ -79,16 +79,14 @@ namespace TerrainGeneration
 
                 avgWfc += _terrain.WfcTime;
                 avgPerlin += _terrain.PerlinTime;
-                avgPaint += _terrain.PaintTime;
                 avgTotal += _terrain.TotalTime;
             }
 
             avgWfc /= TestsPerStep;
             avgPerlin /= TestsPerStep;
-            avgPaint /= TestsPerStep;
             avgTotal /= TestsPerStep;
 
-            file.WriteLine($"{i} {avgWfc} {avgPerlin} {avgPaint} {avgTotal}");
+            file.WriteLine($"{i} {avgWfc} {avgPerlin} {avgTotal}");
             file.Flush();
         }
     }

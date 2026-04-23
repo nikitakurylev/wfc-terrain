@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TerrainGeneration.Interpolators;
 using TerrainGeneration.ScriptableObjects;
 using UnityEngine;
@@ -29,14 +30,14 @@ namespace TerrainGeneration
         public float TotalTime { get; private set; }
         public float WfcTime { get; private set; }
         public float PerlinTime { get; private set; }
-        public float PaintTime { get; private set; }
 
         private Biome[,] biomes;
         private Vector2Int[,] biomeCenter;
         
         public void GenerateTerrain()
         {
-            StartCoroutine(GenerateTerrainCoroutine(_settings));
+            //StartCoroutine(GenerateTerrainCoroutine(_settings));
+            GenerateTerrain(_settings);
         }
 
         private IEnumerator GenerateTerrainCoroutine(ITerrainGenerationSettings settings)
@@ -69,7 +70,6 @@ namespace TerrainGeneration
             TotalTime = 0;
             WfcTime = 0;
             PerlinTime = 0;
-            PaintTime = 0;
 
             var startTime = Time.realtimeSinceStartup;
 
@@ -98,7 +98,7 @@ namespace TerrainGeneration
             GenerateHeightMap(settings, 0, 0, width, length);
 
             TotalTime = Time.realtimeSinceStartup - startTime;
-            PerlinTime = TotalTime - PaintTime - WfcTime;
+            PerlinTime = TotalTime - WfcTime;
             Debug.Log(TotalTime);
         }
         
@@ -204,7 +204,6 @@ namespace TerrainGeneration
                         heights[i, j] += cachedPerlin.GetValue(octaveScale) * biomeFactor;
                     }
 
-                    var localPaintTime = Time.realtimeSinceStartup;
                     if (x < terrainData.alphamapResolution && y < terrainData.alphamapResolution)
                     {
                         var height = heights[i, j];
@@ -214,7 +213,6 @@ namespace TerrainGeneration
                         }
                     }
 
-                    PaintTime += Time.realtimeSinceStartup - localPaintTime;
                     if (Time.realtimeSinceStartup - generationTime > 1)
                     {
                         generationTime = Time.realtimeSinceStartup;
@@ -246,8 +244,9 @@ namespace TerrainGeneration
                 Mathf.Min(terrainData.alphamapResolution, length),
                 terrainData.alphamapLayers];
             var heights = new float[width, length];
+            var alphamapResolution = terrainData.alphamapResolution;
 
-            for (var i = 0; i < width; i++)
+            Parallel.For(0, width, i =>
             {
                 for (var j = 0; j < length; j++)
                 {
@@ -261,7 +260,7 @@ namespace TerrainGeneration
                     var cachedPerlin = new CachedPerlinNoise(x, y);
                     foreach (var weight in weights)
                         heights[i, j] += weight.Item1.OctaveAmplitudes[0] * weight.Item2;
-                    
+
                     for (var octaveIndex = 1; octaveIndex < settings.OctaveScales.Count; octaveIndex++)
                     {
                         var octaveScale = settings.OctaveScales[octaveIndex];
@@ -273,8 +272,7 @@ namespace TerrainGeneration
                         heights[i, j] += cachedPerlin.GetValue(octaveScale) * biomeFactor;
                     }
 
-                    var localPaintTime = Time.realtimeSinceStartup;
-                    if (x < terrainData.alphamapResolution && y < terrainData.alphamapResolution)
+                    if (x < alphamapResolution && y < alphamapResolution)
                     {
                         var height = heights[i, j];
                         foreach (var weight in weights)
@@ -282,10 +280,8 @@ namespace TerrainGeneration
                             AddTerrainLayerAlpha(alphaMaps, i, j, weight.Item2, weight.Item1, height);
                         }
                     }
-
-                    PaintTime += Time.realtimeSinceStartup - localPaintTime;
                 }
-            }
+            });
 
             _terrain.terrainData.SetHeights(startX, startY, heights);
             _terrain.terrainData.SetAlphamaps(startX, startY, alphaMaps);
@@ -328,7 +324,6 @@ namespace TerrainGeneration
                         AddTerrainLayerAlpha(alphaMaps, i, j, 1, biome, height);
                     }
 
-                    PaintTime += Time.realtimeSinceStartup - localPaintTime;
                     if (Time.realtimeSinceStartup - generationTime > 1)
                     {
                         generationTime = Time.realtimeSinceStartup;

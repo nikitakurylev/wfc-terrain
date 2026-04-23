@@ -44,12 +44,11 @@ namespace TerrainGeneration
                     break;
             }
 
-            var areas = new(Biome, float)[neighbours.Count];
+            var areas = new List<(Biome, float)>();
             float total = 0f;
 
-            for (var i = 0; i < neighbours.Count; i++)
+            foreach (var n in neighbours)
             {
-                var n = neighbours[i];
                 var subCell = new List<Vector2>(cell);
 
                 foreach (var other in neighbours)
@@ -70,16 +69,18 @@ namespace TerrainGeneration
 
                 if (a > 0)
                 {
-                    areas[i] = (n.biome, a);
+                    areas.Add((n.biome, a));
                     total += a;
                 }
             }
 
+            var result = new (Biome, float)[areas.Count];
+            
             // Normalize
-            for (var i = 0; i < neighbours.Count; i++)
-                areas[i].Item2 /= total;
+            for (var i = 0; i < areas.Count; i++)
+                result[i] = (areas[i].Item1, areas[i].Item2 / total);
 
-            return areas;
+            return result;
         }
 
         static List<Vector2> CreateBoundingBox(Vector2 c, float r)
