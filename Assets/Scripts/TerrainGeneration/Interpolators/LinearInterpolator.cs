@@ -7,13 +7,11 @@ namespace TerrainGeneration.Interpolators
     {
         private readonly Biome[,] _biomes;
         private readonly int _biomeSize;
-        private readonly AnimationCurve _interpolationCurve;
 
-        public LinearInterpolator(Biome[,] biomes, int biomeSize, AnimationCurve interpolationCurve)
+        public LinearInterpolator(Biome[,] biomes, int biomeSize)
         {
             _biomes = biomes;
             _biomeSize = biomeSize;
-            _interpolationCurve = interpolationCurve;
         }
         public (Biome, float)[] ComputeWeights(Vector2Int position)
         {
@@ -43,13 +41,11 @@ namespace TerrainGeneration.Interpolators
             return Vector4.Lerp(
                 Vector4.Lerp(new Vector4(1, 0, 0, 0),
                     new Vector4(0, 1, 0, 0),
-                    _interpolationCurve
-                        .Evaluate(horizontalT)),
+                    Ease.InOutQuad(horizontalT)),
                 Vector4.Lerp(new Vector4(0, 0, 1, 0),
                     new Vector4(0, 0, 0, 1),
-                    _interpolationCurve
-                        .Evaluate(horizontalT)),
-                _interpolationCurve.Evaluate(verticalT));
+                    Ease.InOutQuad(horizontalT)),
+                Ease.InOutQuad(verticalT));
         }
     }
 }

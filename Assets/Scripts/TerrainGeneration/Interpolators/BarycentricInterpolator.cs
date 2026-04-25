@@ -40,8 +40,8 @@ namespace TerrainGeneration.Interpolators
 
             float area = Cross(b - a, c - a);
 
-            float w1 = Cross(b - p, c - p) / area;
-            float w2 = Cross(c - p, a - p) / area;
+            float w1 = Ease.InOutCubic(Cross(b - p, c - p) / area);
+            float w2 = Ease.InOutCubic(Cross(c - p, a - p) / area);
             float w3 = 1f - w1 - w2;
 
             return new []

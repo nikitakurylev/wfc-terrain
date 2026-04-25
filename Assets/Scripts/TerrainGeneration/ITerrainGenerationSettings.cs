@@ -9,7 +9,6 @@ namespace TerrainGeneration
         int Size { get; }
         int BiomeSize { get; }
         List<Biome> Biomes { get; }
-        AnimationCurve InterpolationCurve { get; }
         List<float> OctaveScales { get; }
         InterpolatorType InterpolatorType { get; }
     }

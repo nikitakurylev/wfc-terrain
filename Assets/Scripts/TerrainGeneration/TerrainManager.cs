@@ -164,8 +164,7 @@ namespace TerrainGeneration
         {
             ITerrainInterpolator interpolator = settings.InterpolatorType switch
             {
-                InterpolatorType.Linear => new LinearInterpolator(biomes, settings.BiomeSize,
-                    settings.InterpolationCurve),
+                InterpolatorType.Linear => new LinearInterpolator(biomes, settings.BiomeSize),
                 InterpolatorType.Barycentric => new BarycentricInterpolator(biomes, biomeCenter),
                 InterpolatorType.Sibson => new SibsonInterpolator(biomes, biomeCenter, settings.BiomeSize),
                 _ => throw new ArgumentOutOfRangeException()
@@ -232,8 +231,7 @@ namespace TerrainGeneration
         {
             ITerrainInterpolator interpolator = settings.InterpolatorType switch
             {
-                InterpolatorType.Linear => new LinearInterpolator(biomes, settings.BiomeSize,
-                    settings.InterpolationCurve),
+                InterpolatorType.Linear => new LinearInterpolator(biomes, settings.BiomeSize),
                 InterpolatorType.Barycentric => new BarycentricInterpolator(biomes, biomeCenter),
                 InterpolatorType.Sibson => new SibsonInterpolator(biomes, biomeCenter, settings.BiomeSize),
                 _ => throw new ArgumentOutOfRangeException()

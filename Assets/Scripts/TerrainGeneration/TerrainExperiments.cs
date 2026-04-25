@@ -72,7 +72,6 @@ namespace TerrainGeneration
                     Size = size,
                     Biomes = _settings.Biomes,
                     BiomeSize = biomeSize,
-                    InterpolationCurve = _settings.InterpolationCurve,
                     OctaveScales = _settings.OctaveScales,
                     InterpolatorType = interpolatorType
                 });

@@ -9,7 +9,6 @@ namespace TerrainGeneration
         public int Size { get; set; }
         public int BiomeSize { get; set; }
         public List<Biome> Biomes { get; set; }
-        public AnimationCurve InterpolationCurve { get; set; }
         public List<float> OctaveScales { get; set; }
         public InterpolatorType InterpolatorType { get; set; }
     }
