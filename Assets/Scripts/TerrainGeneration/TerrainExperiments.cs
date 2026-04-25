@@ -40,10 +40,10 @@ namespace TerrainGeneration
                 File.Delete(filename);
         
             var file = File.CreateText(filename);
-            file.WriteLine("biomeSize wfc perlin paint total");
+            file.WriteLine("biomeSize wfc perlin total");
 
-            for (int i = 8; i <= 64; i += 2)
-                RunExperimentAndWriteResult(file, i, 1024, i, interpolatorType);
+            for (int i = 16; i <= 64; i += 4)
+                RunExperimentAndWriteResult(file, i, 512, i, interpolatorType);
 
             file.Close();
         }
@@ -54,9 +54,9 @@ namespace TerrainGeneration
                 File.Delete(filename);
         
             var file = File.CreateText(filename);
-            file.WriteLine("size wfc perlin paint total");
+            file.WriteLine("size wfc perlin total");
 
-            for (int i = 16; i <= 1024; i += 16)
+            for (int i = 128; i <= 1024; i += 64)
                 RunExperimentAndWriteResult(file, i, i, 32, interpolatorType);
         
             file.Close();

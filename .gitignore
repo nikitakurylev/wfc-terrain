@@ -50,3 +50,8 @@ terrainSize7biomes.csv
 biomeSize3biomes-linear.csv
 biomeSize7biomes-barycentric.csv
 biomeSize7biomes-linear.csv
+biomeSize7biomes-sibson.csv
+terrainSize3biomes-linear.csv
+terrainSize7biomes-barycentric.csv
+terrainSize7biomes-linear.csv
+terrainSize7biomes-sibson.csv
