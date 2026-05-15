@@ -19,4 +19,4 @@ Available "tools" are:
 
 ### Experiments
 
-To run experiments, find GameObject `Generator` in `SampleScene` and press "Start Experiments" button on `Terrain Experiments` component. Experiments results will be written to .csv files in root folder.
+To run experiments, open scene named `SampleScene` and press "Play", then press "Run Experiments" in the bottom right. Experiments results will be written to .csv files in root folder.

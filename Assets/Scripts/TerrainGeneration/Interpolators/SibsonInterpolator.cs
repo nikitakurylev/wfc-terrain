@@ -7,41 +7,24 @@ namespace TerrainGeneration
     public class SibsonInterpolator : ITerrainInterpolator
     {
         private readonly int _biomeSize;
+        private readonly Vector2Int[,] _centers;
+        private readonly Biome[,] _biomes;
         private readonly List<(Vector2 pos, Biome biome)>[,] _neighbours;
 
         public SibsonInterpolator(Biome[,] biomes, Vector2Int[,] centers, int biomeSize)
         {
             _biomeSize = biomeSize;
             _neighbours = new List<(Vector2 pos, Biome biome)>[biomes.GetLength(0), biomes.GetLength(1)];
-            for (int i = 0; i < biomes.GetLength(0); i++)
-            {
-                for (int j = 0; j < biomes.GetLength(1); j++)
-                {
-                    _neighbours[i, j] = CollectNeighbours(
-                        centers,
-                        biomes,
-                        i,
-                        j,
-                        biomes.GetLength(0)
-                    );
-                }
-            }
+            _centers = centers;
+            _biomes = biomes;
         }
 
         public (Biome, float)[] ComputeWeights(Vector2Int p)
         {
-            var neighbours = _neighbours[(p.x - 1) / _biomeSize, (p.y - 1) / _biomeSize];
+            var neighbours = CollectNeighbours(p);
 
-            // Initial infinite Voronoi cell (big square)
-            var cell = new List<Vector2>
-            {
-                p + new Vector2(-10000f, -10000f),
-                p + new Vector2(-10000f, 10000f),
-                p + new Vector2(10000f, 10000f),
-                p + new Vector2(10000f, -10000f)
-            };
+            var cell = InfiniteCell(p);
 
-            // Clip against each neighbour bisector
             foreach (var n in neighbours)
             {
                 cell = ClipCell(cell, p, n.pos);
@@ -51,7 +34,7 @@ namespace TerrainGeneration
             }
 
             var areas = new List<(Biome, float)>();
-            float total = 0f;
+            var total = 0f;
 
             foreach (var n in neighbours)
             {
@@ -61,36 +44,29 @@ namespace TerrainGeneration
                 {
                     if (other.pos == n.pos) continue;
 
-                    subCell = ClipCell(
-                        subCell,
-                        n.pos,
-                        other.pos
-                    );
+                    subCell = ClipCell(subCell, n.pos, other.pos);
 
                     if (subCell.Count == 0)
                         break;
                 }
 
-                float a = PolygonArea(subCell);
+                var a = PolygonArea(subCell);
 
-                if (a > 0)
-                {
-                    areas.Add((n.biome, a));
-                    total += a;
-                }
+                if (a <= 0) continue;
+                
+                areas.Add((n.biome, a));
+                total += a;
             }
 
             var result = new (Biome, float)[areas.Count];
-            
-            // Normalize
+
             for (var i = 0; i < areas.Count; i++)
                 result[i] = (areas[i].Item1, areas[i].Item2 / total);
 
             return result;
         }
 
-        // Half-plane clipping (Sutherland–Hodgman)
-        static List<Vector2> ClipCell(
+        private static List<Vector2> ClipCell(
             List<Vector2> poly,
             Vector2 p,
             Vector2 site)
@@ -125,6 +101,14 @@ namespace TerrainGeneration
 
             return output;
         }
+        
+        private List<Vector2> InfiniteCell(Vector2Int p) => new List<Vector2>
+        {
+            p + new Vector2(-10000f, -10000f),
+            p + new Vector2(-10000f, 10000f),
+            p + new Vector2(10000f, 10000f),
+            p + new Vector2(10000f, -10000f)
+        };
 
         static Vector2 Intersect(
             Vector2 a,
@@ -155,43 +139,26 @@ namespace TerrainGeneration
             return Mathf.Abs(area) * 0.5f;
         }
 
-        static List<(Vector2 pos, Biome biome)> CollectNeighbours(
-            Vector2Int[,] centers,
-            Biome[,] biomes,
-            int cx,
-            int cy,
-            int size,
-            int maxRadius = 2 // usually enough
-        )
+        private List<(Vector2 pos, Biome biome)> CollectNeighbours(Vector2Int point)
         {
+            var biomeX = (point.x - 1) / _biomeSize;
+            var biomeY = (point.y - 1) / _biomeSize;
+            var size = _biomes.GetLength(0);
+            
             List<(Vector2, Biome)> result = new();
 
-            float maxInfluence = float.PositiveInfinity;
-
-            for (int r = 0; r <= maxRadius; r++)
+            for (var i = biomeX - 2; i <= biomeX + 2; i++)
+            for (var j = biomeY - 2; j <= biomeY + 2; j++)
             {
-                bool added = false;
+                if (i < 0 || j < 0 || i >= size || j >= size)
+                    continue;
 
-                for (int i = cx - r; i <= cx + r; i++)
-                for (int j = cy - r; j <= cy + r; j++)
-                {
-                    if (i < 0 || j < 0 || i >= size || j >= size)
-                        continue;
-
-                    // Only border of square (avoid duplicates)
-                    if (Mathf.Abs(i - cx) != r &&
-                        Mathf.Abs(j - cy) != r)
-                        continue;
-
-                    Vector2 c = centers[i, j];
-
-                    result.Add((c, biomes[i, j]));
-                    added = true;
-                }
-
-                // If no new useful points, stop
-                if (!added && r > 2)
-                    break;
+                var c = _centers[i, j];
+                
+                if ((c - point).magnitude * _biomeSize / 2 > _biomeSize * _biomeSize)
+                    continue;
+                
+                result.Add((c, _biomes[i, j]));
             }
 
             return result;
