@@ -33,7 +33,13 @@ namespace TerrainGeneration
             var neighbours = _neighbours[(p.x - 1) / _biomeSize, (p.y - 1) / _biomeSize];
 
             // Initial infinite Voronoi cell (big square)
-            List<Vector2> cell = CreateBoundingBox(p, 10000f);
+            var cell = new List<Vector2>
+            {
+                p + new Vector2(-10000f, -10000f),
+                p + new Vector2(-10000f, 10000f),
+                p + new Vector2(10000f, 10000f),
+                p + new Vector2(10000f, -10000f)
+            };
 
             // Clip against each neighbour bisector
             foreach (var n in neighbours)
@@ -83,17 +89,6 @@ namespace TerrainGeneration
             return result;
         }
 
-        static List<Vector2> CreateBoundingBox(Vector2 c, float r)
-        {
-            return new List<Vector2>
-            {
-                c + new Vector2(-r, -r),
-                c + new Vector2(-r, r),
-                c + new Vector2(r, r),
-                c + new Vector2(r, -r)
-            };
-        }
-
         // Half-plane clipping (Sutherland–Hodgman)
         static List<Vector2> ClipCell(
             List<Vector2> poly,
@@ -117,11 +112,11 @@ namespace TerrainGeneration
                 {
                     output.Add(b);
                 }
-                else if (aIn && !bIn)
+                else if (aIn)
                 {
                     output.Add(Intersect(a, b, mid, n));
                 }
-                else if (!aIn && bIn)
+                else if (bIn)
                 {
                     output.Add(Intersect(a, b, mid, n));
                     output.Add(b);
@@ -158,15 +153,6 @@ namespace TerrainGeneration
             }
 
             return Mathf.Abs(area) * 0.5f;
-        }
-
-        static float ComputeOverlap(
-            List<Vector2> cell,
-            Vector2 p,
-            List<Vector2> neighbours)
-        {
-            // Sibson area ≈ full cell area / neighbour count
-            return PolygonArea(cell) / neighbours.Count;
         }
 
         static List<(Vector2 pos, Biome biome)> CollectNeighbours(

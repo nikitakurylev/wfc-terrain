@@ -36,33 +36,7 @@ namespace TerrainGeneration
         
         public void GenerateTerrain()
         {
-            //StartCoroutine(GenerateTerrainCoroutine(_settings));
             GenerateTerrain(_settings);
-        }
-
-        private IEnumerator GenerateTerrainCoroutine(ITerrainGenerationSettings settings)
-        {
-            var terrainData = _terrain.terrainData;
-
-            int width = settings.Size;
-            int length = settings.Size;
-            TileScale = terrainData.size.x / width;
-            ScaledBiomeSize = TileScale * _settings.BiomeSize;
-            var biomeMapSize = Mathf.CeilToInt(1f * width / settings.BiomeSize) + 1;
-
-            WfcTime = Time.realtimeSinceStartup;
-            biomes = _waveFunctionCollapse.GenerateBiomes(biomeMapSize);
-            biomeCenter = new Vector2Int[biomeMapSize, biomeMapSize];
-
-            for (int i = 0; i < biomeMapSize; i++)
-            for (int j = 0; j < biomeMapSize; j++)
-            {
-                biomeCenter[i, j] = new Vector2Int(
-                    i * settings.BiomeSize + Random.Range(-settings.BiomeSize / 2, settings.BiomeSize / 2),
-                    j * settings.BiomeSize + Random.Range(-settings.BiomeSize / 2, settings.BiomeSize / 2));
-            }
-
-            yield return GenerateHeightMapCoroutine(settings, 0, 0, width, length);
         }
 
         public void GenerateTerrain(ITerrainGenerationSettings settings)
