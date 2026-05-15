@@ -16,8 +16,8 @@ namespace TerrainGeneration
         private TerrainGenerationSettings _settings;
 
         [InspectorButton("StartExperiments", ButtonWidth = 120)] public bool _startExperiments;
-
-        void StartExperiments()
+        
+        public void StartExperiments()
         {
             _settings = _threeBiomes;
             RunBiomeSizeExperiment("biomeSize3biomes-linear.csv", InterpolatorType.Linear);
@@ -42,7 +42,7 @@ namespace TerrainGeneration
             var file = File.CreateText(filename);
             file.WriteLine("biomeSize wfc perlin total");
 
-            for (int i = 16; i <= 64; i += 4)
+            for (int i = 8; i <= 64; i += 4)
                 RunExperimentAndWriteResult(file, i, 512, i, interpolatorType);
 
             file.Close();
