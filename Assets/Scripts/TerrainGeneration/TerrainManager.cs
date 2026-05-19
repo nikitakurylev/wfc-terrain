@@ -162,6 +162,20 @@ namespace TerrainGeneration
 
                     var weights = interpolator.ComputeWeights(new Vector2Int(x, y));
 
+                    if (_settings.UseDebugColors)
+                    {
+                        if (x < terrainData.alphamapResolution && y < terrainData.alphamapResolution)
+                        {
+                            var height = heights[i, j];
+                            foreach (var weight in weights)
+                            {
+                                AddTerrainLayerAlpha(alphaMaps, i, j, weight.Item2, weight.Item1, height);
+                            }
+                        }
+                        heights[i, j] = 0.6f;
+                        continue;
+                    }
+
                     var cachedPerlin = new CachedPerlinNoise(x, y);
                     foreach (var weight in weights)
                         heights[i, j] += weight.Item1.OctaveAmplitudes[0] * weight.Item2;
@@ -229,6 +243,20 @@ namespace TerrainGeneration
 
                     var weights = interpolator.ComputeWeights(new Vector2Int(x, y));
 
+                    if (_settings.UseDebugColors)
+                    {
+                        if (x < alphamapResolution && y < alphamapResolution)
+                        {
+                            var height = heights[i, j];
+                            foreach (var weight in weights)
+                            {
+                                AddTerrainLayerAlpha(alphaMaps, i, j, weight.Item2, weight.Item1, height);
+                            }
+                        }
+                        heights[i, j] = 0.6f;
+                        continue;
+                    }
+
                     var cachedPerlin = new CachedPerlinNoise(x, y);
                     foreach (var weight in weights)
                         heights[i, j] += weight.Item1.OctaveAmplitudes[0] * weight.Item2;
@@ -289,7 +317,6 @@ namespace TerrainGeneration
                         heights[i, j] += cachedPerlin.GetValue(octaveScale) * biome.OctaveAmplitudes[octaveIndex];
                     }
 
-                    var localPaintTime = Time.realtimeSinceStartup;
                     if (x < terrainData.alphamapResolution && y < terrainData.alphamapResolution)
                     {
                         var height = heights[i, j];
@@ -313,6 +340,12 @@ namespace TerrainGeneration
         private void AddTerrainLayerAlpha(float[,,] alphaMaps, int i, int j, float biomeStrength, Biome biome,
             float height)
         {
+            if (_settings.UseDebugColors)
+            {
+                alphaMaps[i, j, biome.DebugColor] += biomeStrength;
+                return;
+            }
+            
             var colorStrength = biome.GetColorInterpolation(height);
 
             alphaMaps[i, j, biome.Color1] += biomeStrength * (1 - colorStrength);

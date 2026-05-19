@@ -12,9 +12,11 @@ namespace TerrainGeneration.ScriptableObjects
         [field: SerializeField] public float ClusterFactor { get; private set; }
         [field: SerializeField] private LayerHeight _color1;
         [field: SerializeField] private LayerHeight _color2;
+        [field: SerializeField] private int _debugColor;
 
         public int Color1 => _color1.LayerIndex;
         public int Color2 => _color2.LayerIndex;
+        public int DebugColor => _debugColor;
         
         public float GetColorInterpolation(float height)
         {

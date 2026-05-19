@@ -25,9 +25,8 @@ MonoBehaviour:
   <ClusterFactor>k__BackingField: 2
   _color1:
     <Height>k__BackingField: 0.6
-    <Layer>k__BackingField: {fileID: 8574412962073106934, guid: 050681fc5ec54dc4fa2b5a1c6971dd86, type: 2}
     <LayerIndex>k__BackingField: 7
   _color2:
     <Height>k__BackingField: 0.605
-    <Layer>k__BackingField: {fileID: 8574412962073106934, guid: 7d5eaeba361c0e74799d0d51f94931df, type: 2}
     <LayerIndex>k__BackingField: 6
+  _debugColor: 16
