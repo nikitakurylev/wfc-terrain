@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.IO;
 using TerrainGeneration.ScriptableObjects;
 using UnityEngine;
@@ -7,7 +7,7 @@ namespace TerrainGeneration
 {
     public class TerrainExperiments : MonoBehaviour
     {
-        private const int TestsPerStep = 5;
+        private const int TestsPerStep = 20;
 
         [SerializeField] private TerrainManager _terrain;
         [SerializeField] private TerrainGenerationSettings _threeBiomes;
@@ -19,19 +19,21 @@ namespace TerrainGeneration
         
         public void StartExperiments()
         {
+            var dateString = DateTime.Today.ToShortDateString();
+            Directory.CreateDirectory(dateString);
             _settings = _threeBiomes;
-            RunBiomeSizeExperiment("biomeSize3biomes-linear.csv", InterpolatorType.Linear);
+            RunBiomeSizeExperiment($"{dateString}/biomeSize3biomes-linear.csv", InterpolatorType.Linear);
             _settings = _sevenBiomes;
-            RunBiomeSizeExperiment("biomeSize7biomes-linear.csv", InterpolatorType.Linear);
-            RunBiomeSizeExperiment("biomeSize7biomes-barycentric.csv", InterpolatorType.Barycentric);
-            RunBiomeSizeExperiment("biomeSize7biomes-sibson.csv", InterpolatorType.Sibson);
+            RunBiomeSizeExperiment($"{dateString}/biomeSize7biomes-linear.csv", InterpolatorType.Linear);
+            RunBiomeSizeExperiment($"{dateString}/biomeSize7biomes-barycentric.csv", InterpolatorType.Barycentric);
+            RunBiomeSizeExperiment($"{dateString}/biomeSize7biomes-sibson.csv", InterpolatorType.Sibson);
 
             _settings = _threeBiomes;
-            RunTerrainSizeExperiment("terrainSize3biomes-linear.csv", InterpolatorType.Linear);
+            RunTerrainSizeExperiment($"{dateString}/terrainSize3biomes-linear.csv", InterpolatorType.Linear);
             _settings = _sevenBiomes;
-            RunTerrainSizeExperiment("terrainSize7biomes-linear.csv", InterpolatorType.Linear);
-            RunTerrainSizeExperiment("terrainSize7biomes-barycentric.csv", InterpolatorType.Barycentric);
-            RunTerrainSizeExperiment("terrainSize7biomes-sibson.csv", InterpolatorType.Sibson);
+            RunTerrainSizeExperiment($"{dateString}/terrainSize7biomes-linear.csv", InterpolatorType.Linear);
+            RunTerrainSizeExperiment($"{dateString}/terrainSize7biomes-barycentric.csv", InterpolatorType.Barycentric);
+            RunTerrainSizeExperiment($"{dateString}/terrainSize7biomes-sibson.csv", InterpolatorType.Sibson);
         }
 
         void RunBiomeSizeExperiment(string filename, InterpolatorType interpolatorType)
@@ -43,7 +45,7 @@ namespace TerrainGeneration
             file.WriteLine("biomeSize wfc perlin total");
 
             for (int i = 8; i <= 64; i += 4)
-                RunExperimentAndWriteResult(file, i, 512, i, interpolatorType);
+                RunExperimentAndWriteResult(file, i, 1024, 1024 / i, interpolatorType);
 
             file.Close();
         }
@@ -76,9 +78,9 @@ namespace TerrainGeneration
                     InterpolatorType = interpolatorType
                 });
 
-                avgWfc += _terrain.WfcTime;
-                avgPerlin += _terrain.PerlinTime;
-                avgTotal += _terrain.TotalTime;
+                avgWfc += _terrain.WfcTime * 1000;
+                avgPerlin += _terrain.PerlinTime * 1000;
+                avgTotal += _terrain.TotalTime * 1000;
             }
 
             avgWfc /= TestsPerStep;
