@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using TerrainGeneration.Interpolators;
 using TerrainGeneration.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
 namespace TerrainGeneration
@@ -30,6 +32,7 @@ namespace TerrainGeneration
         public float TotalTime { get; private set; }
         public float WfcTime { get; private set; }
         public float PerlinTime { get; private set; }
+        public float MemoryUsage { get; private set; }
 
         private Biome[,] biomes;
         private Vector2Int[,] biomeCenter;
@@ -41,6 +44,8 @@ namespace TerrainGeneration
 
         public void GenerateTerrain(ITerrainGenerationSettings settings)
         {
+            MemoryUsage = GC.GetTotalMemory(true);
+
             TotalTime = 0;
             WfcTime = 0;
             PerlinTime = 0;
@@ -283,6 +288,7 @@ namespace TerrainGeneration
                 }
             });
 
+            MemoryUsage = (GC.GetTotalMemory(false) - MemoryUsage) / (1024.0f * 1024.0f);
             _terrain.terrainData.SetHeights(startX, startY, heights);
             _terrain.terrainData.SetAlphamaps(startX, startY, alphaMaps);
         }
